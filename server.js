@@ -14,7 +14,8 @@ const MAX_PLAYERS = 18;
 const MIN_PLAYERS = 2;
 const MAX_ROUNDS = 9;
 
-const COUNTDOWN_SECONDS = 10;
+const COUNTDOWN_SECONDS = 10; // default; host-selectable
+const COUNTDOWN_OPTIONS = [10, 15, 20, 25, 30];
 const READY_MS = 5000;        // "get ready" lead-in before each countdown
 const REVEAL_MS = 3000;       // time-diff ranking shown first
 const WINNER_MS = 2000;       // winner celebration (who grabbed) after reveal
@@ -56,6 +57,7 @@ class Room {
     this.zeroAt = 0;
     this.lateUntil = 0;
     this.hiddenWindow = 0;
+    this.countdownSeconds = COUNTDOWN_SECONDS;
     this.pressSeq = 0;
     this.results = [];
     this.holderId = null;
@@ -83,7 +85,7 @@ class Room {
       round: this.round,
       maxRounds: MAX_ROUNDS,
 
-      countdownSeconds: COUNTDOWN_SECONDS,
+      countdownSeconds: this.countdownSeconds,
       maxPlayers: MAX_PLAYERS,
       minPlayers: MIN_PLAYERS,
       hiddenWindow: this.hiddenWindow,
@@ -138,12 +140,12 @@ class Room {
       p.pressed = false;
       p.diff = null;
     }
-    // Hide the final `round` seconds: round 1 hides 1s (visible 10→2), round 9 hides 9s (only "10" shows).
-    this.hiddenWindow = this.round;
+    // Hide the last `round + (countdownSeconds - 10)` seconds (10s: round N hides Ns).
+    this.hiddenWindow = this.round + (this.countdownSeconds - 10);
 
     const now = Date.now();
     this.countdownStart = now + READY_MS;
-    this.zeroAt = this.countdownStart + COUNTDOWN_SECONDS * 1000;
+    this.zeroAt = this.countdownStart + this.countdownSeconds * 1000;
     this.hiddenAt = this.zeroAt - this.hiddenWindow * 1000;
     this.lateUntil = this.zeroAt + LATE_WINDOW_MS;
     this.phase = 'ready';
@@ -158,7 +160,7 @@ class Room {
     this.schedule(() => {
       if (this.phase !== 'snatch') return;
       this.resolveSnatch();
-    }, READY_MS + COUNTDOWN_SECONDS * 1000 + LATE_WINDOW_MS);
+    }, READY_MS + this.countdownSeconds * 1000 + LATE_WINDOW_MS);
   }
 
   resolveSnatch() {
@@ -254,6 +256,15 @@ class Room {
       case 'start': {
         if (!player.isHost) break;
         this.startGame();
+        break;
+      }
+      case 'configure': {
+        if (!player.isHost || this.phase !== 'lobby') break;
+        const sec = Number(msg.countdownSeconds);
+        if (COUNTDOWN_OPTIONS.includes(sec)) {
+          this.countdownSeconds = sec;
+          this.broadcastState();
+        }
         break;
       }
       case 'back_to_lobby': {

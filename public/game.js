@@ -23,6 +23,7 @@
     avatarPicker: $('#avatar-picker'),
     btnStart: $('#btn-start'),
     btnShare: $('#btn-share'),
+    countdownOptions: document.querySelectorAll('.countdown-option'),
     // home / room entry
     viewHome: $('#view-home'),
     btnCreate: $('#btn-create'),
@@ -376,6 +377,13 @@
     el.btnStart.innerHTML = me && me.isHost
       ? '<span class="material-symbols-outlined">play_arrow</span> 开始游戏'
       : '<span class="material-symbols-outlined">lock</span> 等待主持人';
+    // countdown picker (host-only)
+    const isHost = me && me.isHost;
+    el.countdownOptions.forEach((btn) => {
+      const sec = Number(btn.dataset.sec);
+      btn.classList.toggle('selected', state.countdownSeconds === sec);
+      btn.disabled = !isHost;
+    });
 
     // player grid
     const cells = [];
@@ -665,6 +673,13 @@
 
   el.btnStart.addEventListener('click', () => send({ type: 'start' }));
   el.btnLobby.addEventListener('click', () => send({ type: 'back_to_lobby' }));
+  el.countdownOptions.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const me = selfPlayer();
+      if (!me || !me.isHost || !state || state.phase !== 'lobby') return;
+      send({ type: 'configure', countdownSeconds: Number(btn.dataset.sec) });
+    });
+  });
 
   el.btnShare.addEventListener('click', openShareModal);
 

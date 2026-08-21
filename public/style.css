@@ -248,6 +248,27 @@ body { display: flex; flex-direction: column; }
 
 .actions-card { display: flex; flex-direction: column; gap: 14px; background: var(--primary-container); }
 
+.countdown-picker { display: flex; flex-direction: column; gap: 10px; }
+.countdown-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.countdown-option {
+  flex: 1 1 0; min-width: 52px;
+  padding: 10px 6px;
+  border: 3px solid var(--ink);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--on-bg);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.countdown-option:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--ink); }
+.countdown-option:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0 0 0 0 var(--ink); }
+.countdown-option.selected { background: var(--secondary-container); color: var(--on-secondary-container); }
+.countdown-option:disabled { opacity: .5; cursor: not-allowed; }
+
 .contestants { display: flex; flex-direction: column; gap: 16px; }
 .contestants-head {
   display: flex; align-items: center; justify-content: space-between;
