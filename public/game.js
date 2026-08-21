@@ -121,6 +121,7 @@
       roomCode = null;
       selfId = null;
       state = null;
+      bgMusic.stop();
       pendingJoin = null;
       render();
       clearTimeout(reconnectTimer);
@@ -191,6 +192,23 @@
     win() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.26, 'triangle', 0.18, i * 0.09)); },
     none() { this.tone(180, 0.3, 'sine', 0.14); },
   };
+  // ---------- Background music ----------
+  const bgMusic = (() => {
+    const audio = new Audio('/assets/cake_wait_bg.m4a');
+    audio.loop = true;
+    audio.volume = 0.5;
+    const live = () => state && (state.phase === 'ready' || state.phase === 'snatch');
+    return {
+      play() { const p = audio.play(); if (p) p.catch(() => {}); },
+      stop() { audio.pause(); audio.currentTime = 0; },
+      // unlock autoplay on first gesture; resume if a round is already live
+      unlock() {
+        const p = audio.play();
+        if (p) p.then(() => { if (!live()) { audio.pause(); audio.currentTime = 0; } }).catch(() => {});
+      },
+    };
+  })();
+
 
   // ---------- Message handling ----------
   function handle(msg) {
@@ -222,9 +240,12 @@
 
 
   function detectTransitions() {
-    // phase sounds
+    // phase sounds + background music
     if (state.phase !== prevPhase) {
-      if (state.phase === 'reveal') {
+      if (state.phase === 'ready') {
+        bgMusic.play();
+      } else if (state.phase === 'reveal') {
+        bgMusic.stop();
         if (state.winnerId) AudioFX.ding(); else AudioFX.none();
       } else if (state.phase === 'winner') {
         if (state.winnerId) AudioFX.win();
@@ -640,7 +661,7 @@
   });
 
   // unlock audio on first interaction
-  window.addEventListener('pointerdown', () => AudioFX.ensure(), { once: true });
+  window.addEventListener('pointerdown', () => { AudioFX.ensure(); bgMusic.unlock(); }, { once: true });
 
   // keep arena laid out on resize
   window.addEventListener('resize', () => { if (state && state.phase !== 'lobby' && state.phase !== 'leaderboard') layoutArena(); });

@@ -280,6 +280,7 @@ const MIME = {
   '.svg': 'image/svg+xml',
   '.json': 'application/json; charset=utf-8',
   '.ico': 'image/x-icon',
+  '.m4a': 'audio/mp4',
 };
 
 function serveStatic(req, res) {
