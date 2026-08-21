@@ -793,9 +793,19 @@
   }
 
   // ---------- Events ----------
-  el.btnGrab.addEventListener('click', () => {
+  function doGrab() {
     AudioFX.grab();
     send({ type: 'snatch', pressServerMs: serverNow() });
+  }
+  el.btnGrab.addEventListener('click', doGrab);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    if (el.btnGrab.disabled) return;
+    e.preventDefault();
+    doGrab();
   });
 
   el.btnStart.addEventListener('click', () => send({ type: 'start' }));
