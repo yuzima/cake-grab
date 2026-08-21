@@ -1,71 +1,71 @@
 # AGENTS.md
 
-Cake Grab（原 Rhythm Cake Snatch）—— 网页端多人抢蛋糕派对游戏。无框架、无构建步骤，Node.js + 原生 HTML/CSS/JS。
+Cake Grab (formerly Rhythm Cake Snatch) — a web-based multiplayer cake-grabbing party game. No framework, no build step; Node.js + vanilla HTML/CSS/JS.
 
-## 1. 技术栈
+## 1. Tech Stack
 
-- **服务端**：Node.js（CommonJS），唯一依赖 `ws@^8.18.0`。单文件 `server.js` 同时承担静态文件服务与 WebSocket 游戏逻辑。
-- **客户端**：原生 HTML/CSS/JS，单页应用（所有视图都在 `index.html` 中，通过 `.view.active` 切换）。
-- **视觉**：Neo-Brutalism（4px 黑描边、硬阴影、Quicksand 字体、黄/粉/青三色）。
-- **i18n**：英文为默认，中文走 `/zh` 路径。客户端 `I18N` 字典 + `data-i18n*` 属性，服务端按 `locale` 生成默认名与错误消息。
+- **Server**: Node.js (CommonJS), single dependency `ws@^8.18.0`. One file, `server.js`, handles both static file serving and the WebSocket game logic.
+- **Client**: vanilla HTML/CSS/JS, single-page app (all views live in `index.html`, toggled via `.view.active`).
+- **Visuals**: Neo-Brutalism (4px black borders, hard shadows, Quicksand, yellow/pink/cyan).
+- **i18n**: English by default, Chinese at `/zh`. Client uses an `I18N` dictionary + `data-i18n*` attributes; the server localizes default names and error messages from the `locale` field.
 
-## 2. 目录结构
+## 2. Directory Structure
 
 ```
 cake-grab/
-├── server.js                  # 服务端（静态服务 + WebSocket 游戏逻辑）
+├── server.js                  # server (static serving + WebSocket game logic)
 ├── package.json               # name: cake-grab; scripts.start = node server.js
 ├── package-lock.json
 ├── .gitignore                 # node_modules/, adjusted.webp, cake_hand_transparent.png, input.webp
-├── cake_wait_bg.m4a           # 背景音乐源文件（跟踪；public/assets 下还有一份服务用副本）
+├── cake_wait_bg.m4a           # bg-music source file (tracked; a served copy also lives under public/assets)
 └── public/
-    ├── index.html             # 单页 UI：topbar / home / lobby / game / leaderboard / share modal / toast
-    ├── style.css              # Neo-Brutalism 样式
-    ├── game.js                # 客户端逻辑（IIFE）：WebSocket、渲染、i18n、音频、竞技场布局
+    ├── index.html             # single-page UI: topbar / home / lobby / game / leaderboard / share modal / toast
+    ├── style.css              # Neo-Brutalism styling
+    ├── game.js                # client logic (IIFE): WebSocket, rendering, i18n, audio, arena layout
     └── assets/
-        ├── avatars/01.png..20.png   # 20 个玩家头像（RGBA 512px）
-        ├── hero-cake.png            # 首页蛋糕图（581×482 透明底）
-        ├── favicon.webp             # 站点图标
-        └── cake_wait_bg.m4a         # 每轮背景音乐（11s AAC）
+        ├── avatars/01.png..20.png   # 20 player avatars (RGBA 512px)
+        ├── hero-cake.png            # home-page cake image (581×482, transparent bg)
+        ├── favicon.webp             # site icon
+        └── cake_wait_bg.m4a         # per-round background music (11s AAC)
 ```
 
-根目录的 `adjusted.webp`、`cake_hand_transparent.png`、`input.webp` 是图片处理的临时源文件，已 gitignore，不提交。
+The root `adjusted.webp`, `cake_hand_transparent.png`, and `input.webp` are temporary image-processing sources; they are gitignored and not committed.
 
-## 3. 架构
+## 3. Architecture
 
-### 3.1 服务端（server.js）
+### 3.1 Server (server.js)
 
-- `Room` 类持有房间状态机：`lobby → ready → snatch → reveal → winner → leaderboard`。
-- 房间用 `Map<code, Room>` 管理，4 位数字码（1000–9999）。
-- 阶段推进用 `Room.schedule(fn, delayMs)` 定时器；`beginSnatch()` 启动一轮，`resolveSnatch()` 结算。
-- 每个连接对应一个 `player`（`id / ws / name / avatar / isHost / cakes / pressed / diff / locale`）。
-- 静态服务 `serveStatic`：`/`、`/zh`、`/zh/` 都返回 `index.html`；MIME 表含 `.m4a`、`.webp`。
+- The `Room` class owns a per-room state machine: `lobby → ready → snatch → reveal → winner → leaderboard`.
+- Rooms are held in a `Map<code, Room>` keyed by a 4-digit code (1000–9999).
+- Phase transitions use `Room.schedule(fn, delayMs)` timers; `beginSnatch()` starts a round, `resolveSnatch()` scores it.
+- Each connection maps to a `player` (`id / ws / name / avatar / isHost / cakes / pressed / diff / locale`).
+- Static serving (`serveStatic`): `/`, `/zh`, and `/zh/` all return `index.html`; the MIME map includes `.m4a` and `.webp`.
 
-### 3.2 WebSocket 协议
+### 3.2 WebSocket Protocol
 
-**客户端 → 服务端：**
+**Client → Server:**
 
-| type | 载荷 | 说明 |
+| type | payload | notes |
 |---|---|---|
-| `create` | `locale` | 创建房间，成为房主 |
-| `join` | `code`, `locale` | 加入房间 |
-| `ping` | `t0` | 时钟同步（服务端回 `pong`） |
-| `update` | `name`, `avatar` | 改名字/头像（仅 lobby） |
-| `start` | — | 房主开始游戏 |
-| `configure` | `countdownSeconds` | 房主设置倒计时（仅 lobby，值须在选项内） |
-| `back_to_lobby` | — | 房主从结算页回到大厅 |
-| `snatch` | `pressServerMs` | 抢蛋糕（按服务器时间戳，便于精确计时） |
+| `create` | `locale` | create a room, become host |
+| `join` | `code`, `locale` | join a room |
+| `ping` | `t0` | clock sync (server replies `pong`) |
+| `update` | `name`, `avatar` | change name/avatar (lobby only) |
+| `start` | — | host starts the game |
+| `configure` | `countdownSeconds` | host sets countdown (lobby only, must be an allowed value) |
+| `back_to_lobby` | — | host returns to lobby from the leaderboard |
+| `snatch` | `pressServerMs` | grab the cake (server timestamp for precise scoring) |
 
-**服务端 → 客户端：**
+**Server → Client:**
 
-| type | 载荷 |
+| type | payload |
 |---|---|
 | `welcome` | `selfId`, `roomCode`, `state` |
-| `state` | 完整序列化状态 |
+| `state` | full serialized state |
 | `pong` | `t0`, `serverNow` |
-| `error` | `message`（已本地化） |
+| `error` | `message` (localized) |
 
-### 3.3 状态结构（`Room.serialize()`）
+### 3.3 State Shape (`Room.serialize()`)
 
 ```
 phase, roomCode, round, maxRounds
@@ -76,37 +76,37 @@ results: [{ id, name, avatar, diff, seq }]
 players: [{ id, name, avatar, isHost, cakes, pressed, diff }]
 ```
 
-### 3.4 客户端（game.js）
+### 3.4 Client (game.js)
 
-- IIFE，`el` 集中 DOM 引用；`state` 为最新服务端状态，`selfId` 区分自己。
-- `applyState → render → renderLobby/renderGame/renderLeaderboard`，`detectTransitions` 处理音效。
-- `updateClock` 在 `requestAnimationFrame` 循环里按 `state.zeroAt/hiddenAt` 渲染倒计时。
-- 时钟同步：`ping/pong` 计算 offset（指数平滑），`serverNow() = Date.now() + offset`。
-- 音频：Web Audio 合成音效（`AudioFX`）+ HTML5 `<audio>` 背景音乐（`bgMusic`）。
+- An IIFE; `el` centralizes DOM references; `state` is the latest server state, `selfId` identifies the local player.
+- `applyState → render → renderLobby/renderGame/renderLeaderboard`; `detectTransitions` triggers sound effects.
+- `updateClock` runs in a `requestAnimationFrame` loop, rendering the countdown from `state.zeroAt` / `state.hiddenAt`.
+- Clock sync: `ping`/`pong` computes an offset (exponential smoothing); `serverNow() = Date.now() + offset`.
+- Audio: synthesized Web Audio SFX (`AudioFX`) + an HTML5 `<audio>` element for background music (`bgMusic`).
 
-## 4. 游戏规则
+## 4. Game Rules
 
-- **人数**：2–18 人（`MIN_PLAYERS=2`，`MAX_PLAYERS=18`），房主也参与。
-- **轮数**：固定 9 轮（`MAX_ROUNDS=9`），每轮每人只能抢 1 次。
-- **倒计时时长**：房主在大厅可选 10 / 15 / 20 / 25 / 30 秒（`COUNTDOWN_OPTIONS`），默认 10。
-- **每轮流程**：
-  1. `ready` 5 秒（`READY_MS`，倒计时面板隐藏，背景音乐 1 秒后响起）。
-  2. `snatch` 倒计时（所选秒数）+ 0 之后 2 秒宽限（`LATE_WINDOW_MS`）。
-  3. `reveal` 3 秒（`REVEAL_MS`，显示时差排行）。
-  4. `winner` 2 秒（`WINNER_MS`，显示本轮抢到者）。
-- **计分**：`diff = 按下时刻 - zeroAt`（毫秒），负=抢早、正=抢晚。本轮胜者 = `min |diff|`；并列取更早按下（`seq` 小者）。胜者 +1 块蛋糕。
-- **时差显示**：`fmtDiff` 用 `-`/`+` 前缀 + 秒（如 `-0.60s`），仅在 reveal/winner 阶段显示。
-- **倒计时隐藏**：`hiddenWindow = round + (countdownSeconds - 10)`，`hiddenAt = zeroAt - hiddenWindow*1000`。
-  - 10s：第 N 轮隐藏最后 N 秒。
-  - 15s：第 1 轮隐藏 6 秒（1+5），第 2 轮 7 秒，以此类推。
-  - 30s：第 9 轮隐藏 29 秒（只显示「30」1 秒）。
-  - 0 及之后完全隐藏。
-- **结算**：9 轮后按蛋糕数降序出排行榜，房主可「回到大厅」。
-- **操作**：抓取按钮点击或按空格键（`Space`）抢；输入框聚焦时空格不触发；按钮禁用（ready/reveal/已抢）时不触发。
+- **Players**: 2–18 (`MIN_PLAYERS=2`, `MAX_PLAYERS=18`); the host also plays.
+- **Rounds**: fixed 9 (`MAX_ROUNDS=9`); each player may grab exactly once per round.
+- **Countdown length**: host chooses 10 / 15 / 20 / 25 / 30 seconds in the lobby (`COUNTDOWN_OPTIONS`); default 10.
+- **Round flow**:
+  1. `ready` 5s (`READY_MS`; the clock panel is hidden; background music starts 1s in).
+  2. `snatch` countdown (chosen seconds) + 2s grace after 0 (`LATE_WINDOW_MS`).
+  3. `reveal` 3s (`REVEAL_MS`; shows the time-diff ranking).
+  4. `winner` 2s (`WINNER_MS`; shows who grabbed this round).
+- **Scoring**: `diff = press time - zeroAt` (ms); negative = early, positive = late. Round winner = `min |diff|`; ties go to the earlier press (smaller `seq`). Winner earns +1 cake.
+- **Diff display**: `fmtDiff` uses a `-`/`+` prefix plus seconds (e.g. `-0.60s`), shown only during reveal/winner.
+- **Countdown hiding**: `hiddenWindow = round + (countdownSeconds - 10)`, `hiddenAt = zeroAt - hiddenWindow*1000`.
+  - 10s: round N hides the last N seconds.
+  - 15s: round 1 hides 6s (1+5), round 2 hides 7s, and so on.
+  - 30s: round 9 hides 29s (only "30" shows for 1s).
+  - At 0 and beyond the clock is fully hidden.
+- **Final score**: after 9 rounds, the leaderboard sorts players by cake count descending; the host can return to the lobby.
+- **Controls**: grab via the button click or the `Space` key; Space is ignored while an input is focused, and when the grab button is disabled (ready/reveal/already-pressed).
 
-## 5. 关键常量
+## 5. Key Constants
 
-| 常量 | 值 | 位置 |
+| Constant | Value | Location |
 |---|---|---|
 | `MAX_PLAYERS` / `MIN_PLAYERS` | 18 / 2 | server.js |
 | `MAX_ROUNDS` | 9 | server.js |
@@ -117,55 +117,55 @@ players: [{ id, name, avatar, isHost, cakes, pressed, diff }]
 | `NAME_MAX` | 16 | server.js |
 | `AVATAR_COUNT` | 20 | game.js |
 
-## 6. 运行与部署
+## 6. Run & Deploy
 
 ```bash
 npm install
-npm start        # 等价 node server.js，监听 PORT（默认 3000）
+npm start        # equivalent to `node server.js`; listens on PORT (default 3000)
 ```
 
-- 访问 `/` 英文版，`/zh` 中文版。
-- Render 部署：Build `npm install`，Start `node server.js`，`PORT` 由平台注入。
+- `/` serves English, `/zh` serves Chinese.
+- Render deploy: Build `npm install`, Start `node server.js`; `PORT` is injected by the platform.
 
-## 7. 测试方案
+## 7. Test Plan
 
-仓库**没有**提交的自动化测试套件；验证以按需、一次性脚本为主（脚本放在 `/tmp`，不入库）。改动后按下面的方式验证，而不是跑全量测试。
+The repo has **no committed automated test suite**; verification is ad-hoc, one-off scripts (kept in `/tmp`, not committed). After a change, verify as follows rather than running a full suite.
 
-### 7.1 语法检查
+### 7.1 Syntax check
 
 ```bash
 node --check server.js
 node --check public/game.js
 ```
 
-### 7.2 服务端逻辑（Node WebSocket 脚本）
+### 7.2 Server logic (Node WebSocket scripts)
 
-用 `ws` 直连游戏服务器，驱动 `create / join / start / configure / snatch`，断言 `state` 里的字段。脚本在 `/tmp` 下，运行时需指定 `ws` 解析路径：
+Drive the game server directly with `ws` (`create / join / start / configure / snatch`) and assert fields in `state`. Scripts live in `/tmp`, so resolve `ws` explicitly:
 
 ```bash
 NODE_PATH=/Users/yuzi/workspace/cake-grab/node_modules node /tmp/xxx-test.js
 ```
 
-典型断言点：房间号、人数上限、`countdownSeconds`、`hiddenWindow`、`zeroAt - countdownStart`、`hiddenAt`、按下的 `diff`/`pressed`、错误消息本地化。
+Typical assertions: room code, player cap, `countdownSeconds`, `hiddenWindow`, `zeroAt - countdownStart`, `hiddenAt`, press `diff`/`pressed`, localized error messages.
 
-### 7.3 UI / 渲染（无头 Chrome CDP）
+### 7.3 UI / rendering (headless Chrome CDP)
 
-1. `spawn` 本机 Chrome：`--headless=new --remote-debugging-port=<PORT> --user-data-dir=/tmp/...`。
-2. `fetch http://127.0.0.1:<PORT>/json` 取页面 `webSocketDebuggerUrl`。
-3. 用 `ws` 连接，`Page.navigate` + `Runtime.evaluate` 读取/驱动 DOM（`getComputedStyle`、`textContent`、`classList`、`.click()`、派发 `KeyboardEvent` 等）。
-4. 需要真实多玩家时：一个 `ws` 连接当房主 + 浏览器 `?room=<code>` 自动加入当第二人。
+1. `spawn` the local Chrome: `--headless=new --remote-debugging-port=<PORT> --user-data-dir=/tmp/...`.
+2. `fetch http://127.0.0.1:<PORT>/json` to get the page's `webSocketDebuggerUrl`.
+3. Connect with `ws`, then `Page.navigate` + `Runtime.evaluate` to read/drive the DOM (`getComputedStyle`, `textContent`, `classList`, `.click()`, dispatching `KeyboardEvent`, etc.).
+4. For a real multi-player scenario: one `ws` connection acts as host, while the browser joins via `?room=<code>` as the second player.
 
-常用验证模式：`data-i18n` 文案、倒计时面板隐藏/显示、按钮禁用态、竞技场头像坐标、胜利弹层、空格抢蛋糕、bouncing/动画等。
+Common checks: `data-i18n` copy, countdown panel show/hide, button disabled state, arena avatar positions, winner overlay, spacebar grab, bouncing/animations.
 
-### 7.4 约定
+### 7.4 Conventions
 
-- 改客户端静态资源记得 bump 缓存号（`index.html` 里的 `style.css?v=`、`game.js?v=`），服务端静态响应已 `Cache-Control: no-cache`，但浏览器仍会缓存。
-- 改 `server.js` 后需重启服务（hub 进程 `cakegrab`，`restart`）。
-- 声音效果无法在无头环境断言音色，只能靠 `node --check` + 代码走查 + 真机试听。
+- After touching client static assets, bump the cache-busters in `index.html` (`style.css?v=`, `game.js?v=`). Server responses already send `Cache-Control: no-cache`, but browsers still cache.
+- After editing `server.js`, restart the server (hub process `cakegrab`, `restart`).
+- Sound quality can't be asserted in headless Chrome; rely on `node --check` + code review + real-device listening.
 
-## 8. 开发约定
+## 8. Development Conventions
 
-- 逻辑集中在 `server.js` / `game.js`；不引入新框架或构建步骤。
-- i18n 文案统一走 `I18N` 字典（en/zh）+ `t(key, vars)`，静态 HTML 用 `data-i18n`；不在渲染代码里硬编码中英文字符串。
-- 品牌性口号（`CAKE GRAB`、`CAKE GRABBED!`、`GAME OVER!`）两种语言都保持英文。
-- 数值/时序规则改在 `server.js` 顶部常量，客户端只消费 `state` 里服务端算好的 `zeroAt/hiddenAt` 等时间点。
+- Keep logic in `server.js` / `game.js`; do not introduce a framework or build step.
+- All UI copy goes through the `I18N` dictionary (en/zh) + `t(key, vars)`; static HTML uses `data-i18n`. Do not hardcode Chinese/English strings in render code.
+- Brand shouts (`CAKE GRAB`, `CAKE GRABBED!`, `GAME OVER!`) stay English in both locales.
+- Numeric/timing rules live in the constants at the top of `server.js`; the client only consumes server-computed timestamps (`zeroAt` / `hiddenAt`).
