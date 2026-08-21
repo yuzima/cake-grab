@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cake Grab — 节奏抢蛋糕</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="dots-bg" aria-hidden="true"></div>
+
+<!-- ===================== TOP BAR ===================== -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-cake material-symbols-outlined">cake</span>
+    <span class="brand-title">CAKE GRAB</span>
+  </div>
+  <div class="topbar-right">
+    <span id="round-badge" class="pill">大厅</span>
+    <span id="conn-badge" class="pill conn" data-state="connecting">
+      <span class="dot"></span><span id="conn-text">连接中…</span>
+    </span>
+  </div>
+</header>
+<!-- ===================== HOME (ROOM ENTRY) ===================== -->
+<main id="view-home" class="view">
+  <div class="home-wrap">
+    <div class="home-hero">
+      <div class="hero-cake bounce"><span class="material-symbols-outlined">cake</span></div>
+      <h1 class="home-title">Ready to <span class="home-accent">Grab?</span></h1>
+    </div>
+
+    <div class="home-grid">
+      <div class="card home-card home-card-host">
+        <span class="material-symbols-outlined home-ico">add_circle</span>
+        <h2 class="home-card-title">创建房间</h2>
+        <p class="home-card-desc">开启一个新房间，邀请好友一起玩！</p>
+        <button id="btn-create" class="btn btn-primary home-cta" type="button">
+          <span class="material-symbols-outlined">add_circle</span> 创建房间
+        </button>
+      </div>
+
+      <div class="card home-card home-card-join">
+        <span class="material-symbols-outlined home-ico">group_add</span>
+        <h2 class="home-card-title">加入房间</h2>
+        <p class="home-card-desc">输入 4 位房间号加入游戏。</p>
+        <div class="pin-row">
+          <input class="pin-input" maxlength="1" inputmode="numeric" placeholder="·" autocomplete="off">
+          <input class="pin-input" maxlength="1" inputmode="numeric" placeholder="·" autocomplete="off">
+          <input class="pin-input" maxlength="1" inputmode="numeric" placeholder="·" autocomplete="off">
+          <input class="pin-input" maxlength="1" inputmode="numeric" placeholder="·" autocomplete="off">
+        </div>
+        <p id="join-error" class="join-error" hidden></p>
+        <button id="btn-join" class="btn btn-primary home-cta" type="button">
+          <span class="material-symbols-outlined">group_add</span> 加入房间
+        </button>
+      </div>
+    </div>
+
+    <div class="servers-pill">
+      <span class="material-symbols-outlined">wifi</span>
+      <span>服务器在线</span>
+    </div>
+  </div>
+</main>
+
+
+<!-- ===================== LOBBY ===================== -->
+<main id="view-lobby" class="view">
+  <div class="lobby-grid">
+    <aside class="lobby-left">
+      <div class="card lobby-card">
+        <span class="corner-badge">Lobby</span>
+        <h2 class="lobby-title">抢蛋糕<br><span class="room-chip" id="room-chip">房间 —</span></h2>
+
+        <div class="meter">
+          <div id="lobby-meter-fill" class="meter-fill"></div>
+          <span id="lobby-meter-pct" class="meter-pct">0%</span>
+        </div>
+        <p id="lobby-status" class="lobby-status">等待玩家加入 (0/20)</p>
+      </div>
+
+      <div class="card join-card">
+        <label class="field-label" for="name-input">你的名字</label>
+        <input id="name-input" class="input" maxlength="16" placeholder="输入名字…" autocomplete="off">
+        <label class="field-label">选择头像</label>
+        <div id="avatar-picker" class="avatar-picker"></div>
+      </div>
+
+      <div class="card actions-card">
+        <button id="btn-start" class="btn btn-primary" disabled>
+          <span class="material-symbols-outlined">play_arrow</span> 开始游戏
+        </button>
+        <button id="btn-share" class="btn btn-surface">
+          <span class="material-symbols-outlined">share</span> 分享邀请
+        </button>
+      </div>
+    </aside>
+
+    <section class="contestants">
+      <div class="contestants-head">
+        <h3>参赛者 <span class="material-symbols-outlined head-ico">celebration</span></h3>
+        <span id="lobby-count" class="pill">0 / 20</span>
+      </div>
+      <div id="player-grid" class="player-grid"></div>
+    </section>
+  </div>
+</main>
+
+<!-- ===================== GAME ===================== -->
+<main id="view-game" class="view">
+  <div class="game-layout">
+  <aside class="clock-panel">
+    <div id="clock" class="clock">
+      <span id="clock-num" class="clock-num">10</span>
+      <span id="clock-sub" class="clock-sub">秒</span>
+    </div>
+  </aside>
+
+    <div class="arena-wrap">
+      <div id="arena" class="arena">
+        <div class="table-outer"></div>
+        <div class="table-inner"></div>
+
+        <div id="cake" class="cake" aria-hidden="true">
+          <svg viewBox="0 0 100 100" width="100%" height="100%">
+            <g stroke="#1b1b1c" stroke-width="4" stroke-linejoin="round" fill="none">
+              <rect x="46" y="10" width="8" height="16" fill="#4deff2"/>
+              <circle cx="50" cy="7" r="5" fill="#ffd700"/>
+              <rect x="34" y="26" width="32" height="15" rx="3" fill="#fd68b3"/>
+              <rect x="27" y="41" width="46" height="17" rx="3" fill="#ffd700"/>
+              <rect x="17" y="58" width="66" height="21" rx="4" fill="#fd68b3"/>
+              <rect x="11" y="79" width="78" height="8" rx="4" fill="#e5e2e3"/>
+            </g>
+            <g fill="#1b1b1c">
+              <circle cx="40" cy="33" r="2"/><circle cx="60" cy="33" r="2"/>
+              <circle cx="50" cy="49" r="2"/><circle cx="35" cy="49" r="2"/><circle cx="65" cy="49" r="2"/>
+              <circle cx="42" cy="68" r="2"/><circle cx="58" cy="68" r="2"/>
+            </g>
+          </svg>
+        </div>
+
+
+        <div id="players" class="players"></div>
+      </div>
+    </div>
+
+    <aside class="diff-panel">
+      <h3 class="diff-title">时差排行 <span class="material-symbols-outlined">schedule</span></h3>
+      <div id="diff-list" class="diff-list"></div>
+    </aside>
+  </div>
+
+  <footer class="game-footer">
+    <button id="btn-grab" class="grab-btn">
+      <span class="material-symbols-outlined">front_hand</span> 抢！
+    </button>
+  </footer>
+
+  <div id="winner-overlay" class="overlay">
+    <div class="sunburst" aria-hidden="true"></div>
+    <div class="winner-content pop-in">
+      <h1 class="winner-headline">CAKE GRABBED!</h1>
+      <div class="winner-avatar-wrap bounce">
+        <img id="winner-avatar" class="winner-avatar" alt="">
+      </div>
+      <div id="winner-name" class="winner-name">—</div>
+      <div id="winner-sub" class="winner-sub">下一轮即将开始…</div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== LEADERBOARD ===================== -->
+<main id="view-leaderboard" class="view">
+  <div class="lb-grid">
+    <div class="lb-left">
+      <div class="lb-header animate-bounce-subtle">
+        <h2 class="lb-title">GAME OVER!</h2>
+        <h3 id="lb-winner-badge" class="lb-winner-badge">—</h3>
+      </div>
+      <div id="lb-rank1" class="lb-rank1"></div>
+      <div class="lb-actions">
+        <button id="btn-lobby" class="btn btn-surface">
+          <span class="material-symbols-outlined">logout</span> 回到大厅
+        </button>
+      </div>
+    </div>
+    <div class="lb-right">
+      <h3 class="lb-lead-title">排行榜</h3>
+      <div id="lb-list" class="lb-list"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== SHARE MODAL ===================== -->
+<div id="share-modal" class="modal" hidden>
+  <div class="modal-backdrop" data-close-share></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 class="modal-title">分享房间</h2>
+      <button id="btn-share-close" class="icon-btn" type="button">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <label class="field-label">邀请链接</label>
+    <div class="copy-row">
+      <input id="share-url" class="input copy-field" readonly>
+      <button id="btn-copy-url" class="copy-btn copy-btn-primary" type="button">复制</button>
+
+    </div>
+    <label class="field-label">房间号</label>
+    <div class="copy-row">
+      <div id="share-code" class="copy-field code-field">—</div>
+      <button id="btn-copy-code" class="copy-btn copy-btn-secondary" type="button">复制</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="/game.js"></script>
+</body>
+</html>
