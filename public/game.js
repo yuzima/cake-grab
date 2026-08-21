@@ -195,7 +195,6 @@
   // ---------- Background music ----------
   const bgMusic = (() => {
     const audio = new Audio('/assets/cake_wait_bg.m4a');
-    audio.loop = true;
     audio.volume = 0.5;
     const live = () => state && (state.phase === 'ready' || state.phase === 'snatch');
     return {
