@@ -510,43 +510,6 @@ body { display: flex; flex-direction: column; }
   100% { transform: translate(0,0) scale(1); }
 }
 
-/* winner overlay */
-.overlay {
-  position: fixed; inset: 0; z-index: 60;
-  display: none; align-items: center; justify-content: center;
-  overflow: hidden;
-}
-.overlay.active { display: flex; }
-.sunburst {
-  position: absolute; inset: -50%;
-  background: repeating-conic-gradient(var(--primary-container) 0 15deg, var(--secondary-container) 15deg 30deg);
-  animation: spin360 10s linear infinite;
-  opacity: .85;
-}
-@keyframes spin360 { 100% { transform: rotate(360deg); } }
-.winner-content {
-  position: relative; z-index: 2;
-  display: flex; flex-direction: column; align-items: center; gap: 20px;
-  text-align: center;
-}
-.winner-headline {
-  margin: 0; font-size: 56px; font-weight: 700; text-transform: uppercase;
-  background: var(--on-bg); color: var(--primary-container);
-  border: 4px solid var(--ink); border-radius: .75rem;
-  padding: 12px 28px; box-shadow: 8px 8px 0 0 var(--ink);
-  transform: rotate(-2deg);
-}
-.winner-avatar-wrap {
-  width: 180px; height: 180px; border-radius: 50%;
-  border: 4px solid var(--ink); overflow: hidden;
-  box-shadow: 8px 8px 0 0 var(--ink); background: var(--surface);
-}
-.winner-avatar { width: 100%; height: 100%; object-fit: cover; }
-.winner-name { font-size: 34px; font-weight: 700; text-transform: uppercase; text-shadow: 4px 4px 0 #fff; }
-.winner-sub { font-size: 18px; font-weight: 600; font-style: italic; opacity: .6; }
-
-.pop-in { animation: popIn .5s cubic-bezier(.175,.885,.32,1.275) forwards; }
-@keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 .bounce { animation: bounceY 2s infinite; }
 @keyframes bounceY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
 
@@ -680,10 +643,12 @@ body { display: flex; flex-direction: column; }
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
-.hero-cake .material-symbols-outlined {
-  font-size: 72px;
-  color: var(--on-primary-container);
+.hero-cake img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .home-title {

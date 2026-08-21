@@ -50,10 +50,6 @@
     clockSub: $('#clock-sub'),
     diffList: $('#diff-list'),
     btnGrab: $('#btn-grab'),
-    winnerOverlay: $('#winner-overlay'),
-    winnerAvatar: $('#winner-avatar'),
-    winnerName: $('#winner-name'),
-    winnerSub: $('#winner-sub'),
 
     // leaderboard
     lbWinnerBadge: $('#lb-winner-badge'),
@@ -187,7 +183,6 @@
       this.tone(330, 0.14, 'sawtooth', 0.12, 0.03);
     },
     ding() { this.tone(880, 0.4, 'sine', 0.18); this.tone(1318, 0.3, 'sine', 0.10, 0.03); },
-    win() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.26, 'triangle', 0.18, i * 0.09)); },
     none() { this.tone(180, 0.3, 'sine', 0.14); },
   };
 
@@ -225,8 +220,6 @@
     if (state.phase !== prevPhase) {
       if (state.phase === 'reveal') {
         if (state.winnerId) AudioFX.ding(); else AudioFX.none();
-      } else if (state.phase === 'winner') {
-        if (state.winnerId) AudioFX.win();
       }
     }
     // holder (steal / claim) sounds
@@ -273,7 +266,7 @@
     // view switching
     el.viewHome.classList.remove('active');
     el.viewLobby.classList.toggle('active', phase === 'lobby');
-    el.viewGame.classList.toggle('active', ['ready', 'snatch', 'reveal', 'winner'].includes(phase));
+    el.viewGame.classList.toggle('active', ['ready', 'snatch', 'reveal'].includes(phase));
     el.viewLeaderboard.classList.toggle('active', phase === 'leaderboard');
 
     if (phase === 'lobby') renderLobby(me);
@@ -359,9 +352,6 @@
     renderDiffPanel();
     renderGrabButton(me);
 
-    if (state.phase === 'winner') renderWinnerOverlay();
-    else el.winnerOverlay.classList.remove('active');
-
     updateClock();
   }
 
@@ -396,7 +386,7 @@
     el.players.innerHTML = nodes.map((p) => {
       const self = p.id === selfId;
       const isHolder = p.id === state.holderId;
-      const showDiff = (state.phase === 'reveal' || state.phase === 'winner') && p.diff != null;
+      const showDiff = (state.phase === 'reveal') && p.diff != null;
       const diff = showDiff ? fmtDiff(p.diff) : '';
       const diffClass = showDiff ? (p.diff <= 0 ? 'early' : 'late') : '';
       return `
@@ -440,7 +430,7 @@
   }
 
   function renderDiffPanel() {
-    if (state.phase !== 'reveal' && state.phase !== 'winner') {
+    if (state.phase !== 'reveal') {
       el.diffList.innerHTML = '<div class="diff-empty">等待玩家抢蛋糕…</div>';
       return;
     }
@@ -464,20 +454,6 @@
     }).join('');
   }
 
-  function renderWinnerOverlay() {
-    const winner = state.winnerId ? state.players.find((p) => p.id === state.winnerId) : null;
-    el.winnerOverlay.classList.add('active');
-    if (winner) {
-      el.winnerAvatar.src = avatarUrl(winner.avatar);
-      el.winnerAvatar.alt = winner.name;
-      el.winnerName.textContent = winner.name;
-      el.winnerSub.textContent = state.round < state.maxRounds ? '下一轮即将开始…' : '结算中…';
-    } else {
-      el.winnerAvatar.src = '';
-      el.winnerName.textContent = '无人抢到';
-      el.winnerSub.textContent = state.round < state.maxRounds ? '下一次即将开始…' : '结算中…';
-    }
-  }
 
   // ---------- Countdown loop ----------
   function updateClock() {
@@ -494,10 +470,6 @@
       el.clockNum.textContent = '!';
       el.clockSub.textContent = '揭晓';
       lastShown = null;
-      return;
-    }
-    if (phase === 'winner') {
-      el.clock.classList.add('hidden-clock');
       return;
     }
     if (phase !== 'snatch') return;
