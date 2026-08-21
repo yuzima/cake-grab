@@ -410,5 +410,5 @@ wss.on('connection', (ws) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Cake Grab running at http://localhost:${PORT}`);
+  console.log(`Cake Wait running at http://localhost:${PORT}`);
 });
