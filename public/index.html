@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=8">
+<link rel="stylesheet" href="/style.css?v=9">
 </head>
 <body>
 <div class="dots-bg" aria-hidden="true"></div>
@@ -161,6 +161,17 @@
     </button>
   </footer>
 
+  <div id="winner-overlay" class="overlay">
+    <div class="sunburst" aria-hidden="true"></div>
+    <div class="winner-content pop-in">
+      <h1 class="winner-headline">CAKE GRABBED!</h1>
+      <div class="winner-avatar-wrap bounce">
+        <img id="winner-avatar" class="winner-avatar" alt="">
+      </div>
+      <div id="winner-name" class="winner-name">—</div>
+      <div id="winner-sub" class="winner-sub">下一轮即将开始…</div>
+    </div>
+  </div>
 </main>
 
 <!-- ===================== LEADERBOARD ===================== -->
@@ -211,6 +222,6 @@
 
 <div id="toast" class="toast" hidden></div>
 
-<script src="/game.js?v=6"></script>
+<script src="/game.js?v=7"></script>
 </body>
 </html>
