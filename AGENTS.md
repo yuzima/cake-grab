@@ -169,3 +169,4 @@ Common checks: `data-i18n` copy, countdown panel show/hide, button disabled stat
 - All UI copy goes through the `I18N` dictionary (en/zh) + `t(key, vars)`; static HTML uses `data-i18n`. Do not hardcode Chinese/English strings in render code.
 - Brand shouts (`CAKE GRAB`, `CAKE GRABBED!`, `GAME OVER!`) stay English in both locales.
 - Numeric/timing rules live in the constants at the top of `server.js`; the client only consumes server-computed timestamps (`zeroAt` / `hiddenAt`).
+- Responsive: single page adapts to viewport. Breakpoints `@media (max-width: 900px)` (views stack; game becomes flex column with sunburst, hidden diff panel) and `600px` (compact topbar). `body` is `height: 100dvh; overflow: hidden`; home/lobby/leaderboard scroll internally via `.view.active { overflow-y: auto }`, while `#view-game.active` is locked (`overflow: hidden`). Arena geometry is computed in `layoutArena()` from `el.arena.clientWidth/Height`, so it adapts automatically.
