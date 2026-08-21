@@ -346,6 +346,14 @@ body { display: flex; flex-direction: column; }
 .clock.hidden-clock { opacity: 0; pointer-events: none; }
 .clock-num { font-size: clamp(60px, 7.5vw, 92px); font-weight: 700; line-height: 1; }
 .clock-sub { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; opacity: .6; }
+.clock-num.bouncing {
+  animation: beat 0.8s ease-in-out infinite;
+}
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
 
 .arena-wrap {
   position: relative;

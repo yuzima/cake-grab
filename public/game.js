@@ -69,7 +69,7 @@
   const avatarUrl = (n) => `/assets/avatars/${String(n).padStart(2, '0')}.png?v=4`;
   const fmtDiff = (ms) => {
     const s = Math.abs(ms) / 1000;
-    return (ms <= 0 ? '太早 ' : '太晚 ') + s.toFixed(2) + 's';
+    return (ms <= 0 ? '-' : '+') + s.toFixed(2) + 's';
   };
 
   // ---------- State ----------
@@ -532,6 +532,7 @@
   // ---------- Countdown loop ----------
   function updateClock() {
     const phase = state.phase;
+    el.clockNum.classList.toggle('bouncing', phase === 'ready');
     if (phase === 'ready') {
       el.clock.classList.remove('hidden-clock');
       el.clockNum.textContent = '准备';
