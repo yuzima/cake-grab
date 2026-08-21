@@ -18,6 +18,7 @@ const COUNTDOWN_SECONDS = 10;
 const READY_MS = 1600;        // "get ready" lead-in before each countdown
 const REVEAL_MS = 1600;       // ranked time-diff reveal
 const WINNER_MS = 2600;       // winner celebration
+const FINAL_REVEAL_MS = 3000; // final round: time-diff ranking shown before leaderboard
 const LATE_WINDOW_MS = 2000;  // grace period after 0 for late presses
 const NAME_MAX = 16;
 
@@ -175,21 +176,23 @@ class Room {
     });
     this.phase = 'reveal';
     this.broadcastState();
-
-    this.schedule(() => {
-      this.phase = 'winner';
-      this.broadcastState();
-    }, REVEAL_MS);
-
-    this.schedule(() => {
-      if (this.round < MAX_ROUNDS) {
-        this.round += 1;
-        this.beginSnatch();
-      } else {
+    if (this.round >= MAX_ROUNDS) {
+      // Final round: show the time-diff ranking for 3s, then jump to leaderboard.
+      this.schedule(() => {
         this.phase = 'leaderboard';
         this.broadcastState();
-      }
-    }, REVEAL_MS + WINNER_MS);
+      }, FINAL_REVEAL_MS);
+    } else {
+      this.schedule(() => {
+        this.phase = 'winner';
+        this.broadcastState();
+      }, REVEAL_MS);
+
+      this.schedule(() => {
+        this.round += 1;
+        this.beginSnatch();
+      }, REVEAL_MS + WINNER_MS);
+    }
   }
 
   startGame() {
