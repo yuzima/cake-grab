@@ -181,12 +181,34 @@
       osc.connect(g); g.connect(ctx.destination);
       osc.start(t0); osc.stop(t0 + dur + 0.02);
     },
+    sweep(from, to, dur, type, vol, delay) {
+      const ctx = this.ensure();
+      if (!ctx) return;
+      const t0 = ctx.currentTime + (delay || 0);
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = type || 'sawtooth';
+      osc.frequency.setValueAtTime(from, t0);
+      osc.frequency.exponentialRampToValueAtTime(to, t0 + dur);
+      g.gain.setValueAtTime(vol || 0.2, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(t0); osc.stop(t0 + dur + 0.02);
+    },
     tick(high) { this.tone(high ? 1800 : 1200, 0.07, 'square', 0.13); },
-    grab() { this.tone(340, 0.12, 'triangle', 0.24); },
-    claim() { this.tone(520, 0.14, 'triangle', 0.20); },
+    grab() {
+      // strong, confrontational snatch: downward sawtooth impact + square bite
+      this.sweep(420, 85, 0.3, 'sawtooth', 0.55);
+      this.tone(130, 0.22, 'square', 0.42, 0.01);
+    },
+    claim() {
+      this.tone(140, 0.26, 'sawtooth', 0.5);
+      this.tone(280, 0.18, 'square', 0.38, 0.01);
+    },
     steal() {
-      this.tone(660, 0.12, 'sawtooth', 0.16);
-      this.tone(330, 0.14, 'sawtooth', 0.12, 0.03);
+      this.tone(660, 0.16, 'sawtooth', 0.45);
+      this.tone(330, 0.18, 'square', 0.35, 0.02);
+      this.tone(990, 0.1, 'sawtooth', 0.28, 0.04);
     },
     ding() { this.tone(880, 0.4, 'sine', 0.18); this.tone(1318, 0.3, 'sine', 0.10, 0.03); },
     win() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.26, 'triangle', 0.18, i * 0.09)); },
