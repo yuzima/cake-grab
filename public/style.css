@@ -35,15 +35,15 @@
 html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
   background: var(--bg);
   color: var(--on-bg);
   font-family: 'Quicksand', sans-serif;
   font-weight: 600;
-  min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
-body { display: flex; flex-direction: column; }
+body { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
 
 .dots-bg {
   position: fixed;
@@ -108,6 +108,7 @@ body { display: flex; flex-direction: column; }
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .corner-badge {
@@ -164,8 +165,9 @@ body { display: flex; flex-direction: column; }
 .conn[data-state="closed"] .dot { background: var(--error); }
 
 /* ---------- Views ---------- */
-.view { position: relative; z-index: 1; flex: 1; display: none; }
-.view.active { display: flex; flex-direction: column; }
+.view { position: relative; z-index: 1; flex: 1; min-height: 0; display: none; }
+.view.active { display: flex; flex-direction: column; overflow-y: auto; }
+#view-game.active { overflow: hidden; }
 
 /* ---------- Lobby ---------- */
 .lobby-grid {
@@ -663,14 +665,28 @@ body { display: flex; flex-direction: column; }
 
 /* responsive */
 @media (max-width: 900px) {
-  .lobby-grid, .lb-grid { grid-template-columns: 1fr; padding: 24px 16px; }
-  .game-layout { grid-template-columns: 1fr; padding: 16px; gap: 12px; }
-  .clock-panel { order: 1; }
-  .clock { width: 110px; height: 110px; }
-  .clock-num { font-size: 46px; }
-  .arena-wrap { order: 2; min-height: 56vh; }
-  .diff-panel { order: 3; max-height: 240px; }
+  .lobby-grid, .lb-grid { grid-template-columns: 1fr; padding: 24px 16px; gap: 24px; }
   .topbar { padding: 10px 16px; }
+
+  /* game: stack, sunburst, arena fills viewport, diff panel hidden */
+  .game-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+    gap: 0;
+    background: repeating-conic-gradient(from 0deg, #fd68b3 0deg 15deg, #ffd700 15deg 30deg);
+  }
+  .clock-panel { flex: none; padding: 12px 0 0; }
+  .clock { width: 96px; height: 96px; box-shadow: 6px 6px 0 0 var(--ink); }
+  .clock-num { font-size: 44px; }
+  .arena-wrap { flex: 1; min-height: 0; }
+  .diff-panel { display: none; }
+
+  .game-footer { padding: 12px 16px; }
+  .grab-btn { font-size: 26px; padding: 14px; max-width: 480px; }
+  .grab-btn .material-symbols-outlined { font-size: 34px; }
 }
 
 /* ---------- Home (room entry) ---------- */
@@ -911,4 +927,19 @@ body { display: flex; flex-direction: column; }
 
 @media (max-width: 760px) {
   .home-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .topbar { padding: 8px 12px; gap: 6px; }
+  .brand { gap: 6px; }
+  .brand-cake { width: 32px; height: 32px; font-size: 18px; }
+  .brand-title { font-size: 18px; }
+  .topbar-right { gap: 6px; }
+  .pill { padding: 4px 8px; font-size: 11px; gap: 4px; }
+
+  .home-wrap { padding: 24px 16px 32px; gap: 28px; }
+  .hero-cake { width: 140px; }
+  .home-card { padding: 24px 20px; }
+  .home-ico { font-size: 48px; }
+  .home-title { font-size: clamp(32px, 11vw, 44px); }
 }
