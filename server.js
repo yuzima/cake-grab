@@ -16,8 +16,8 @@ const MAX_ROUNDS = 9;
 
 const COUNTDOWN_SECONDS = 10;
 const READY_MS = 1600;        // "get ready" lead-in before each countdown
-const REVEAL_MS = 2000;       // time-diff ranking shown first
-const WINNER_MS = 1000;       // winner celebration (who grabbed) after reveal
+const REVEAL_MS = 3000;       // time-diff ranking shown first
+const WINNER_MS = 2000;       // winner celebration (who grabbed) after reveal
 const LATE_WINDOW_MS = 2000;  // grace period after 0 for late presses
 const NAME_MAX = 16;
 
