@@ -2,7 +2,7 @@
   "name": "cake-grab",
   "version": "1.0.0",
   "private": true,
-  "description": "Rhythm Cake Snatch — online multiplayer party game (2-20 players)",
+  "description": "Rhythm Cake Snatch — online multiplayer party game (2-18 players)",
   "type": "commonjs",
   "scripts": {
     "start": "node server.js"

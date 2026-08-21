@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // ---- Game constants ----
-const MAX_PLAYERS = 20;
+const MAX_PLAYERS = 18;
 const MIN_PLAYERS = 2;
 const MAX_ROUNDS = 9;
 
@@ -354,7 +354,7 @@ wss.on('connection', (ws) => {
           break;
         }
         if (target.players.size >= MAX_PLAYERS) {
-          sendTo({ type: 'error', message: '房间已满（最多 20 人）' });
+          sendTo({ type: 'error', message: '房间已满（最多 18 人）' });
           break;
         }
         room = target;

@@ -54,6 +54,7 @@
     winnerAvatar: $('#winner-avatar'),
     winnerName: $('#winner-name'),
     winnerSub: $('#winner-sub'),
+    winnerAvatarWrap: $('#winner-overlay .winner-avatar-wrap'),
 
     // leaderboard
     lbWinnerBadge: $('#lb-winner-badge'),
@@ -492,12 +493,13 @@
     const winner = state.winnerId ? state.players.find((p) => p.id === state.winnerId) : null;
     el.winnerOverlay.classList.add('active');
     if (winner) {
+      el.winnerAvatarWrap.style.display = '';
       el.winnerAvatar.src = avatarUrl(winner.avatar);
       el.winnerAvatar.alt = winner.name;
       el.winnerName.textContent = winner.name;
       el.winnerSub.textContent = state.round < state.maxRounds ? '下一轮即将开始…' : '结算中…';
     } else {
-      el.winnerAvatar.src = '';
+      el.winnerAvatarWrap.style.display = 'none';
       el.winnerName.textContent = '无人抢到';
       el.winnerSub.textContent = state.round < state.maxRounds ? '下一次即将开始…' : '结算中…';
     }
