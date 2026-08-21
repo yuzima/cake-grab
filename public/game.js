@@ -196,10 +196,14 @@
   const bgMusic = (() => {
     const audio = new Audio('/assets/cake_wait_bg.m4a');
     audio.volume = 0.5;
+    let timer = null;
     const live = () => state && (state.phase === 'ready' || state.phase === 'snatch');
+    const play = () => { const p = audio.play(); if (p) p.catch(() => {}); };
+    const stop = () => { clearTimeout(timer); audio.pause(); audio.currentTime = 0; };
     return {
-      play() { const p = audio.play(); if (p) p.catch(() => {}); },
-      stop() { audio.pause(); audio.currentTime = 0; },
+      play,
+      playDelayed(ms) { clearTimeout(timer); timer = setTimeout(() => { if (live()) play(); }, ms); },
+      stop,
       // unlock autoplay on first gesture; resume if a round is already live
       unlock() {
         const p = audio.play();
@@ -242,7 +246,7 @@
     // phase sounds + background music
     if (state.phase !== prevPhase) {
       if (state.phase === 'ready') {
-        bgMusic.play();
+        bgMusic.playDelayed(1000);
       } else if (state.phase === 'reveal') {
         bgMusic.stop();
         if (state.winnerId) AudioFX.ding(); else AudioFX.none();
