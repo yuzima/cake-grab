@@ -118,7 +118,6 @@
       scoring: 'Scoring…',
       noWinner: 'Nobody grabbed',
       revealSub: 'Reveal',
-      sec: 's',
       winnerBadge: 'Game over · {name} wins',
       gameOver: 'Game over',
       backToLobby: 'Back to Lobby',
@@ -172,7 +171,6 @@
       scoring: '结算中…',
       noWinner: '无人抢到',
       revealSub: '揭晓',
-      sec: '秒',
       winnerBadge: '游戏结束 · {name} 获胜',
       gameOver: '游戏结束',
       backToLobby: '回到大厅',
@@ -698,6 +696,7 @@
       el.clock.classList.remove('hidden-clock');
       el.clockNum.textContent = '!';
       el.clockSub.textContent = t('revealSub');
+      el.clockSub.hidden = false;
       lastShown = null;
       return;
     }
@@ -715,7 +714,8 @@
       const whole = Math.max(1, Math.ceil(remaining / 1000));
       el.clock.classList.remove('hidden-clock');
       el.clockNum.textContent = String(whole);
-      el.clockSub.textContent = t('sec');
+      el.clockSub.textContent = '';
+      el.clockSub.hidden = true;
       if (whole !== lastShown) {
         AudioFX.tick(whole % 2 === 0);
         lastShown = whole;
