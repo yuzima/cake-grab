@@ -634,21 +634,12 @@ body { display: flex; flex-direction: column; }
 }
 
 .hero-cake {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: var(--primary-container);
-  border: 4px solid var(--ink);
-  box-shadow: 8px 8px 0 0 var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  width: 180px;
 }
 .hero-cake img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 
 .home-title {
