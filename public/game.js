@@ -385,13 +385,37 @@
     const ry = Math.max(40, h / 2 - 100);  // vertical radius: keep avatars + names clear of top/bottom
 
     positions = {};
-    const nodes = players.map((p, i) => {
-      const angle = (90 + (i * 360) / N) * (Math.PI / 180);
-      const x = cx + Math.cos(angle) * rx;
-      const y = cy + Math.sin(angle) * ry;
-      positions[p.id] = { x, y };
-      return p;
-    });
+    if (N === 1) {
+      positions[players[0].id] = { x: cx, y: cy };
+    } else {
+      // Sample the ellipse perimeter, then place players at equal arc-length
+      // intervals. Even ANGULAR spacing on a non-circular ellipse bunches
+      // avatars at the left/right extremes (arc length per radian is smallest
+      // at the ends of the major axis), which is the "two crowded sides" bug.
+      const SAMPLE = 720;
+      const pts = [];
+      let total = 0;
+      let px = cx + rx, py = cy; // θ = 0 (right)
+      for (let s = 0; s <= SAMPLE; s++) {
+        const θ = (s / SAMPLE) * 2 * Math.PI;
+        const x = cx + Math.cos(θ) * rx;
+        const y = cy + Math.sin(θ) * ry;
+        if (s > 0) total += Math.hypot(x - px, y - py);
+        pts.push({ x, y, cum: total });
+        px = x; py = y;
+      }
+      for (let i = 0; i < N; i++) {
+        const target = (i / N) * total;
+        let lo = 0, hi = SAMPLE;
+        while (lo < hi) { const mid = (lo + hi) >> 1; if (pts[mid].cum >= target) hi = mid; else lo = mid + 1; }
+        const a = lo > 0 ? pts[lo - 1] : pts[0];
+        const b = pts[lo];
+        const seg = b.cum - a.cum;
+        const t = seg > 0 ? (target - a.cum) / seg : 0;
+        positions[players[i].id] = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      }
+    }
+    const nodes = players;
 
     el.players.innerHTML = nodes.map((p) => {
       const self = p.id === selfId;
