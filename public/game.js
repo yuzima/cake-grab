@@ -242,13 +242,13 @@
     if (!saved) return;
     try {
       const p = JSON.parse(saved);
-      if (p.name || p.avatar) {
-        send({ type: 'update', name: p.name || '', avatar: p.avatar || 1 });
+      if (p.name) {
+        send({ type: 'update', name: p.name });
       }
     } catch { /* ignore */ }
   }
-  function saveProfile(name, avatar) {
-    localStorage.setItem('cakegrab-profile', JSON.stringify({ name, avatar }));
+  function saveProfile(name) {
+    localStorage.setItem('cakegrab-profile', JSON.stringify({ name }));
   }
 
   // ---------- Render dispatch ----------
@@ -298,7 +298,7 @@
 
   function selectAvatar(n) {
     const me = selfPlayer();
-    if (me) saveProfile(me.name, n);
+    if (me) saveProfile(me.name);
     send({ type: 'update', name: selfPlayer() ? selfPlayer().name : '', avatar: n });
     el.avatarPicker.querySelectorAll('.avatar-option').forEach((o) => {
       o.classList.toggle('selected', o.dataset.avatar === String(n));
@@ -605,8 +605,8 @@
     nameDebounce = setTimeout(() => {
       const name = el.nameInput.value;
       const me = selfPlayer();
-      if (me) saveProfile(name, me.avatar);
-      send({ type: 'update', name, avatar: selfPlayer() ? selfPlayer().avatar : 1 });
+      if (me) saveProfile(name);
+      send({ type: 'update', name });
     }, 350);
   });
   el.nameInput.addEventListener('keydown', (e) => {

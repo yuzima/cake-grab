@@ -247,7 +247,7 @@ class Room {
       case 'update': {
         if (this.phase !== 'lobby') break;
         player.name = sanitizeName(msg.name);
-        player.avatar = normalizeAvatar(msg.avatar);
+        if (msg.avatar != null) player.avatar = normalizeAvatar(msg.avatar);
         this.broadcastState();
         break;
       }
