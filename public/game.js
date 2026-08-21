@@ -386,7 +386,7 @@
 
     positions = {};
     if (N === 1) {
-      positions[players[0].id] = { x: cx, y: cy };
+      positions[players[0].id] = { x: cx, y: cy + ry };
     } else {
       // Sample the ellipse perimeter, then place players at equal arc-length
       // intervals. Even ANGULAR spacing on a non-circular ellipse bunches
@@ -395,9 +395,9 @@
       const SAMPLE = 720;
       const pts = [];
       let total = 0;
-      let px = cx + rx, py = cy; // θ = 0 (right)
+      let px = cx, py = cy + ry; // θ = π/2 (bottom) — self avatar sits bottom-center
       for (let s = 0; s <= SAMPLE; s++) {
-        const θ = (s / SAMPLE) * 2 * Math.PI;
+        const θ = Math.PI / 2 + (s / SAMPLE) * 2 * Math.PI;
         const x = cx + Math.cos(θ) * rx;
         const y = cy + Math.sin(θ) * ry;
         if (s > 0) total += Math.hypot(x - px, y - py);
