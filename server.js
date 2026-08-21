@@ -22,12 +22,28 @@ const WINNER_MS = 2000;       // winner celebration (who grabbed) after reveal
 const LATE_WINDOW_MS = 2000;  // grace period after 0 for late presses
 const NAME_MAX = 16;
 
+// ---- i18n helpers ----
+function localeOf(msg) {
+  return msg && msg.locale === 'zh' ? 'zh' : 'en';
+}
+function defaultPlayerName(locale, n) {
+  return locale === 'zh' ? '玩家' + n : 'Player ' + n;
+}
+const ERR_MSGS = {
+  room_not_found: { en: 'Room not found. Check the room code.', zh: '房间不存在，请检查房间号' },
+  room_full: { en: 'Room is full (max 18 players).', zh: '房间已满（最多 18 人）' },
+};
+function errMsg(code, locale) {
+  const m = ERR_MSGS[code];
+  return (m && (m[locale] || m.en)) || code;
+}
+
 // ---- Rooms ----
 const rooms = new Map(); // code(number) -> Room
 
-function sanitizeName(raw) {
+function sanitizeName(raw, locale) {
   let s = String(raw == null ? '' : raw).replace(/[\u0000-\u001f\u007f]/g, '').trim();
-  if (!s) s = 'Player';
+  if (!s) s = locale === 'zh' ? '玩家' : 'Player';
   return s.slice(0, NAME_MAX);
 }
 
@@ -248,7 +264,7 @@ class Room {
     switch (msg.type) {
       case 'update': {
         if (this.phase !== 'lobby') break;
-        player.name = sanitizeName(msg.name);
+        player.name = sanitizeName(msg.name, player.locale);
         if (msg.avatar != null) player.avatar = normalizeAvatar(msg.avatar);
         this.broadcastState();
         break;
@@ -302,7 +318,7 @@ function serveStatic(req, res) {
     res.writeHead(400);
     return res.end('Bad request');
   }
-  if (urlPath === '/') urlPath = '/index.html';
+  if (urlPath === '/' || urlPath === '/zh' || urlPath === '/zh/') urlPath = '/index.html';
   const filePath = path.normalize(path.join(PUBLIC_DIR, urlPath));
   if (!filePath.startsWith(PUBLIC_DIR + path.sep) && filePath !== PUBLIC_DIR) {
     res.writeHead(403);
@@ -344,7 +360,8 @@ wss.on('connection', (ws) => {
         player = {
           id: crypto.randomUUID(),
           ws,
-          name: '玩家' + (room.players.size + 1),
+          name: defaultPlayerName(localeOf(msg), room.players.size + 1),
+          locale: localeOf(msg),
           avatar: room.nextAvatar(),
           isHost: true,
           cakes: 0,
@@ -362,18 +379,19 @@ wss.on('connection', (ws) => {
         const code = Number(msg.code);
         const target = rooms.get(code);
         if (!target) {
-          sendTo({ type: 'error', message: '房间不存在，请检查房间号' });
+          sendTo({ type: 'error', message: errMsg('room_not_found', localeOf(msg)) });
           break;
         }
         if (target.players.size >= MAX_PLAYERS) {
-          sendTo({ type: 'error', message: '房间已满（最多 18 人）' });
+          sendTo({ type: 'error', message: errMsg('room_full', localeOf(msg)) });
           break;
         }
         room = target;
         player = {
           id: crypto.randomUUID(),
           ws,
-          name: '玩家' + (room.players.size + 1),
+          name: defaultPlayerName(localeOf(msg), room.players.size + 1),
+          locale: localeOf(msg),
           avatar: room.nextAvatar(),
           isHost: false,
           cakes: 0,

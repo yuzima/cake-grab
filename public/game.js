@@ -73,6 +73,133 @@
     return (ms <= 0 ? '-' : '+') + s.toFixed(2) + 's';
   };
 
+  // ---------- i18n ----------
+  const LOCALE = location.pathname.replace(/\/+$/, '').endsWith('/zh') ? 'zh' : 'en';
+
+  const I18N = {
+    en: {
+      title: 'Cake Grab — Rhythm Cake Snatch',
+      connecting: 'Connecting…',
+      connected: 'Connected',
+      disconnected: 'Disconnected',
+      home: 'Home',
+      lobby: 'Lobby',
+      results: 'Results',
+      roundN: 'Round {n} / {max}',
+      homeTitle: 'Ready to <span class="home-accent">Grab?</span>',
+      createRoomTitle: 'Create Room',
+      createRoomDesc: 'Start a new room and invite your friends!',
+      createRoom: 'Create Room',
+      joinRoomTitle: 'Join Room',
+      joinRoomDesc: 'Enter the 4-digit room code to join.',
+      joinRoom: 'Join Room',
+      serverOnline: 'Server Online',
+      lobbyTitle: 'Cake Grab',
+      roomChip: 'Room #{code}',
+      waitingPlayers: 'Waiting for players ({n}/{max})',
+      yourName: 'Your Name',
+      namePlaceholder: 'Enter name…',
+      chooseAvatar: 'Choose Avatar',
+      countdownLabel: 'Countdown (seconds)',
+      startGame: 'Start Game',
+      waitingHost: 'Waiting for host',
+      shareInvite: 'Share Invite',
+      contestants: 'Contestants',
+      waiting: 'Waiting',
+      you: ' (you)',
+      diffTitle: 'Time Diff',
+      grab: 'GRAB!',
+      grabbed: 'Grabbed!',
+      getReady: 'Get ready…',
+      revealing: 'Revealing…',
+      waitingSnatch: 'Waiting for players to grab…',
+      nextRoundSoon: 'Next round coming soon…',
+      nextSoon: 'Next one coming soon…',
+      scoring: 'Scoring…',
+      noWinner: 'Nobody grabbed',
+      revealSub: 'Reveal',
+      sec: 's',
+      winnerBadge: 'Game over · {name} wins',
+      gameOver: 'Game over',
+      backToLobby: 'Back to Lobby',
+      leaderboardTitle: 'Leaderboard',
+      shareRoom: 'Share Room',
+      inviteLink: 'Invite Link',
+      copy: 'Copy',
+      roomCodeLabel: 'Room Code',
+      enterRoomCode: 'Enter the 4-digit room code',
+      linkCopied: 'Link copied — send it to your friends!',
+      codeCopied: 'Room code copied',
+    },
+    zh: {
+      title: 'Cake Grab — 节奏抢蛋糕',
+      connecting: '连接中…',
+      connected: '已连接',
+      disconnected: '已断开',
+      home: '首页',
+      lobby: '大厅',
+      results: '结算',
+      roundN: '第 {n} / {max} 轮',
+      homeTitle: '准备<span class="home-accent">抢蛋糕？</span>',
+      createRoomTitle: '创建房间',
+      createRoomDesc: '开启一个新房间，邀请好友一起玩！',
+      createRoom: '创建房间',
+      joinRoomTitle: '加入房间',
+      joinRoomDesc: '输入 4 位房间号加入游戏。',
+      joinRoom: '加入房间',
+      serverOnline: '服务器在线',
+      lobbyTitle: '抢蛋糕',
+      roomChip: '房间 #{code}',
+      waitingPlayers: '等待玩家加入 ({n}/{max})',
+      yourName: '你的名字',
+      namePlaceholder: '输入名字…',
+      chooseAvatar: '选择头像',
+      countdownLabel: '倒计时时长（秒）',
+      startGame: '开始游戏',
+      waitingHost: '等待主持人',
+      shareInvite: '分享邀请',
+      contestants: '参赛者',
+      waiting: '等待中',
+      you: ' (你)',
+      diffTitle: '时差排行',
+      grab: '抢！',
+      grabbed: '已抢！',
+      getReady: '准备…',
+      revealing: '揭晓中…',
+      waitingSnatch: '等待玩家抢蛋糕…',
+      nextRoundSoon: '下一轮即将开始…',
+      nextSoon: '下一次即将开始…',
+      scoring: '结算中…',
+      noWinner: '无人抢到',
+      revealSub: '揭晓',
+      sec: '秒',
+      winnerBadge: '游戏结束 · {name} 获胜',
+      gameOver: '游戏结束',
+      backToLobby: '回到大厅',
+      leaderboardTitle: '排行榜',
+      shareRoom: '分享房间',
+      inviteLink: '邀请链接',
+      copy: '复制',
+      roomCodeLabel: '房间号',
+      enterRoomCode: '请输入 4 位房间号',
+      linkCopied: '链接已复制，发给朋友加入吧！',
+      codeCopied: '房间号已复制',
+    },
+  };
+
+  function t(key, vars) {
+    let s = (I18N[LOCALE] && I18N[LOCALE][key]) || (I18N.en && I18N.en[key]) || key;
+    if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+    return s;
+  }
+
+  function applyStaticI18n() {
+    document.documentElement.lang = LOCALE === 'zh' ? 'zh-CN' : 'en';
+    document.querySelectorAll('[data-i18n]').forEach((n) => { n.textContent = t(n.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-html]').forEach((n) => { n.innerHTML = t(n.dataset.i18nHtml); });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((n) => { n.placeholder = t(n.dataset.i18nPlaceholder); });
+  }
+
   // ---------- State ----------
   let ws = null;
   let selfId = null;
@@ -98,7 +225,7 @@
     ws = new WebSocket(`${proto}//${location.host}`);
 
     ws.onopen = () => {
-      setConn('open', '已连接');
+      setConn('open', t('connected'));
       syncClock();
       if (pendingJoin) {
         const p = pendingJoin;
@@ -118,7 +245,7 @@
     };
 
     ws.onclose = () => {
-      setConn('closed', '已断开');
+      setConn('closed', t('disconnected'));
       roomCode = null;
       selfId = null;
       state = null;
@@ -306,7 +433,7 @@
       el.viewLobby.classList.remove('active');
       el.viewGame.classList.remove('active');
       el.viewLeaderboard.classList.remove('active');
-      el.roundBadge.textContent = '首页';
+      el.roundBadge.textContent = t('home');
       return;
     }
 
@@ -314,9 +441,9 @@
     const me = selfPlayer();
 
     // top bar
-    if (phase === 'lobby') el.roundBadge.textContent = '大厅';
-    else if (phase === 'leaderboard') el.roundBadge.textContent = '结算';
-    else el.roundBadge.textContent = `第 ${state.round} / ${state.maxRounds} 轮`;
+    if (phase === 'lobby') el.roundBadge.textContent = t('lobby');
+    else if (phase === 'leaderboard') el.roundBadge.textContent = t('results');
+    else el.roundBadge.textContent = t('roundN', { n: state.round, max: state.maxRounds });
 
     // view switching
     el.viewHome.classList.remove('active');
@@ -358,9 +485,9 @@
     const pct = Math.round((n / state.maxPlayers) * 100);
     el.lobbyMeterFill.style.width = pct + '%';
     el.lobbyMeterPct.textContent = pct + '%';
-    el.lobbyStatus.textContent = `等待玩家加入 (${n}/${state.maxPlayers})`;
+    el.lobbyStatus.textContent = t('waitingPlayers', { n, max: state.maxPlayers });
     el.lobbyCount.textContent = `${n} / ${state.maxPlayers}`;
-    el.roomChip.textContent = '房间 #' + state.roomCode;
+    el.roomChip.textContent = t('roomChip', { code: state.roomCode });
 
 
     // name input (reflect self name without clobbering focus)
@@ -375,8 +502,8 @@
     const canStart = me && me.isHost && n >= state.minPlayers;
     el.btnStart.disabled = !canStart;
     el.btnStart.innerHTML = me && me.isHost
-      ? '<span class="material-symbols-outlined">play_arrow</span> 开始游戏'
-      : '<span class="material-symbols-outlined">lock</span> 等待主持人';
+      ? '<span class="material-symbols-outlined">play_arrow</span> ' + t('startGame')
+      : '<span class="material-symbols-outlined">lock</span> ' + t('waitingHost');
     // countdown picker (host-only)
     const isHost = me && me.isHost;
     el.countdownOptions.forEach((btn) => {
@@ -400,7 +527,7 @@
       cells.push(`
         <div class="player-card empty">
           <span class="material-symbols-outlined">person_add</span>
-          <span class="pc-name">等待中</span>
+          <span class="pc-name">${t('waiting')}</span>
         </div>`);
     }
     el.playerGrid.innerHTML = cells.join('');
@@ -482,7 +609,7 @@
         <div class="player-node ${self ? 'self' : ''} ${isHolder ? 'holder' : ''}" data-id="${p.id}" style="left:${positions[p.id].x}px;top:${positions[p.id].y}px">
           <span class="diff-tag ${diffClass}">${diff}</span>
           <div class="pn-avatar"><img src="${avatarUrl(p.avatar)}" alt="${esc(p.name)}"></div>
-          <span class="pn-name">${esc(p.name)}${self ? ' (你)' : ''}</span>
+          <span class="pn-name">${esc(p.name)}${self ? t('you') : ''}</span>
         </div>`;
     }).join('');
 
@@ -501,26 +628,26 @@
       if (me && me.pressed) {
         el.btnGrab.disabled = true;
         el.btnGrab.classList.remove('armed');
-        el.btnGrab.innerHTML = '<span class="material-symbols-outlined">done</span> 已抢！';
+        el.btnGrab.innerHTML = '<span class="material-symbols-outlined">done</span> ' + t('grabbed');
       } else {
         el.btnGrab.disabled = false;
         el.btnGrab.classList.add('armed');
-        el.btnGrab.innerHTML = '<span class="material-symbols-outlined">front_hand</span> 抢！';
+        el.btnGrab.innerHTML = '<span class="material-symbols-outlined">front_hand</span> ' + t('grab');
       }
     } else if (state.phase === 'ready') {
       el.btnGrab.disabled = true;
       el.btnGrab.classList.remove('armed');
-      el.btnGrab.innerHTML = '<span class="material-symbols-outlined">schedule</span> 准备…';
+      el.btnGrab.innerHTML = '<span class="material-symbols-outlined">schedule</span> ' + t('getReady');
     } else {
       el.btnGrab.disabled = true;
       el.btnGrab.classList.remove('armed');
-      el.btnGrab.innerHTML = '<span class="material-symbols-outlined">visibility</span> 揭晓中…';
+      el.btnGrab.innerHTML = '<span class="material-symbols-outlined">visibility</span> ' + t('revealing');
     }
   }
 
   function renderDiffPanel() {
     if (state.phase !== 'reveal' && state.phase !== 'winner') {
-      el.diffList.innerHTML = '<div class="diff-empty">等待玩家抢蛋糕…</div>';
+      el.diffList.innerHTML = '<div class="diff-empty">' + t('waitingSnatch') + '</div>';
       return;
     }
     const rows = [...state.results].sort((a, b) => {
@@ -528,7 +655,7 @@
       return da === db ? a.seq - b.seq : da - db;
     });
     if (rows.length === 0) {
-      el.diffList.innerHTML = '<div class="diff-empty">等待玩家抢蛋糕…</div>';
+      el.diffList.innerHTML = '<div class="diff-empty">' + t('waitingSnatch') + '</div>';
       return;
     }
     el.diffList.innerHTML = rows.map((r, i) => {
@@ -551,11 +678,11 @@
       el.winnerAvatar.src = avatarUrl(winner.avatar);
       el.winnerAvatar.alt = winner.name;
       el.winnerName.textContent = winner.name;
-      el.winnerSub.textContent = state.round < state.maxRounds ? '下一轮即将开始…' : '结算中…';
+      el.winnerSub.textContent = state.round < state.maxRounds ? t('nextRoundSoon') : t('scoring');
     } else {
       el.winnerAvatarWrap.style.display = 'none';
-      el.winnerName.textContent = '无人抢到';
-      el.winnerSub.textContent = state.round < state.maxRounds ? '下一次即将开始…' : '结算中…';
+      el.winnerName.textContent = t('noWinner');
+      el.winnerSub.textContent = state.round < state.maxRounds ? t('nextSoon') : t('scoring');
     }
   }
 
@@ -570,7 +697,7 @@
     if (phase === 'reveal') {
       el.clock.classList.remove('hidden-clock');
       el.clockNum.textContent = '!';
-      el.clockSub.textContent = '揭晓';
+      el.clockSub.textContent = t('revealSub');
       lastShown = null;
       return;
     }
@@ -588,7 +715,7 @@
       const whole = Math.max(1, Math.ceil(remaining / 1000));
       el.clock.classList.remove('hidden-clock');
       el.clockNum.textContent = String(whole);
-      el.clockSub.textContent = '秒';
+      el.clockSub.textContent = t('sec');
       if (whole !== lastShown) {
         AudioFX.tick(whole % 2 === 0);
         lastShown = whole;
@@ -619,7 +746,7 @@
   function renderLeaderboard() {
     const sorted = [...state.players].sort((a, b) => b.cakes - a.cakes);
     const winner = sorted[0];
-    el.lbWinnerBadge.textContent = winner ? `游戏结束 · ${winner.name} 获胜` : '游戏结束';
+    el.lbWinnerBadge.textContent = winner ? t('winnerBadge', { name: winner.name }) : t('gameOver');
 
     // rank 1
     if (winner) {
@@ -707,13 +834,13 @@
   // ---------- Room entry / share ----------
   function createRoom() {
     clearJoinError();
-    if (ws && ws.readyState === WebSocket.OPEN) send({ type: 'create' });
-    else pendingJoin = { type: 'create' };
+    if (ws && ws.readyState === WebSocket.OPEN) send({ type: 'create', locale: LOCALE });
+    else pendingJoin = { type: 'create', locale: LOCALE };
   }
 
   function joinRoom(code) {
-    if (ws && ws.readyState === WebSocket.OPEN) send({ type: 'join', code });
-    else pendingJoin = { type: 'join', code };
+    if (ws && ws.readyState === WebSocket.OPEN) send({ type: 'join', code, locale: LOCALE });
+    else pendingJoin = { type: 'join', code, locale: LOCALE };
   }
 
   function readPin() {
@@ -778,7 +905,7 @@
   el.btnJoin.addEventListener('click', () => {
     const code = readPin();
     if (code == null) {
-      onJoinError('请输入 4 位房间号');
+      onJoinError(t('enterRoomCode'));
       return;
     }
     clearJoinError();
@@ -805,10 +932,11 @@
 
   el.btnShareClose.addEventListener('click', closeShareModal);
   el.shareModal.querySelector('.modal-backdrop').addEventListener('click', closeShareModal);
-  el.btnCopyUrl.addEventListener('click', () => copyText(shareUrl(), '链接已复制，发给朋友加入吧！'));
-  el.btnCopyCode.addEventListener('click', () => copyText(String(roomCode), '房间号已复制'));
+  el.btnCopyUrl.addEventListener('click', () => copyText(shareUrl(), t('linkCopied')));
+  el.btnCopyCode.addEventListener('click', () => copyText(String(roomCode), t('codeCopied')));
 
   // ---------- Boot ----------
+  applyStaticI18n();
   buildAvatarPicker();
   connect();
   render();

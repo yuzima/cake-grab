@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cake Grab — 节奏抢蛋糕</title>
+<title data-i18n="title">Cake Grab — Rhythm Cake Snatch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,9 +20,9 @@
     <span class="brand-title">CAKE GRAB</span>
   </div>
   <div class="topbar-right">
-    <span id="round-badge" class="pill">大厅</span>
+    <span id="round-badge" class="pill">Lobby</span>
     <span id="conn-badge" class="pill conn" data-state="connecting">
-      <span class="dot"></span><span id="conn-text">连接中…</span>
+      <span class="dot"></span><span id="conn-text" data-i18n="connecting">Connecting…</span>
     </span>
   </div>
 </header>
@@ -31,23 +31,23 @@
   <div class="home-wrap">
     <div class="home-hero">
       <div class="hero-cake bounce"><img src="/assets/hero-cake.png?v=2" alt="cake"></div>
-      <h1 class="home-title">Ready to <span class="home-accent">Grab?</span></h1>
+      <h1 class="home-title" data-i18n-html="homeTitle">Ready to <span class="home-accent">Grab?</span></h1>
     </div>
 
     <div class="home-grid">
       <div class="card home-card home-card-host">
         <span class="material-symbols-outlined home-ico">add_circle</span>
-        <h2 class="home-card-title">创建房间</h2>
-        <p class="home-card-desc">开启一个新房间，邀请好友一起玩！</p>
+        <h2 class="home-card-title" data-i18n="createRoomTitle">Create Room</h2>
+        <p class="home-card-desc" data-i18n="createRoomDesc">Start a new room and invite your friends!</p>
         <button id="btn-create" class="btn btn-primary home-cta" type="button">
-          <span class="material-symbols-outlined">add_circle</span> 创建房间
+          <span class="material-symbols-outlined">add_circle</span> <span data-i18n="createRoom">Create Room</span>
         </button>
       </div>
 
       <div class="card home-card home-card-join">
         <span class="material-symbols-outlined home-ico">group_add</span>
-        <h2 class="home-card-title">加入房间</h2>
-        <p class="home-card-desc">输入 4 位房间号加入游戏。</p>
+        <h2 class="home-card-title" data-i18n="joinRoomTitle">Join Room</h2>
+        <p class="home-card-desc" data-i18n="joinRoomDesc">Enter the 4-digit room code to join.</p>
         <div class="pin-row">
           <input class="pin-input" maxlength="1" inputmode="numeric" placeholder="·" autocomplete="off">
           <input class="pin-input" maxlength="1" inputmode="numeric" placeholder="·" autocomplete="off">
@@ -56,14 +56,14 @@
         </div>
         <p id="join-error" class="join-error" hidden></p>
         <button id="btn-join" class="btn btn-primary home-cta" type="button">
-          <span class="material-symbols-outlined">group_add</span> 加入房间
+          <span class="material-symbols-outlined">group_add</span> <span data-i18n="joinRoom">Join Room</span>
         </button>
       </div>
     </div>
 
     <div class="servers-pill">
       <span class="material-symbols-outlined">wifi</span>
-      <span>服务器在线</span>
+      <span data-i18n="serverOnline">Server Online</span>
     </div>
   </div>
 </main>
@@ -75,25 +75,25 @@
     <aside class="lobby-left">
       <div class="card lobby-card">
         <span class="corner-badge">Lobby</span>
-        <h2 class="lobby-title">抢蛋糕<br><span class="room-chip" id="room-chip">房间 —</span></h2>
+        <h2 class="lobby-title"><span data-i18n="lobbyTitle">Cake Grab</span><br><span class="room-chip" id="room-chip">Room —</span></h2>
 
         <div class="meter">
           <div id="lobby-meter-fill" class="meter-fill"></div>
           <span id="lobby-meter-pct" class="meter-pct">0%</span>
         </div>
-        <p id="lobby-status" class="lobby-status">等待玩家加入 (0/18)</p>
+        <p id="lobby-status" class="lobby-status">Waiting for players (0/18)</p>
       </div>
 
       <div class="card join-card">
-        <label class="field-label" for="name-input">你的名字</label>
-        <input id="name-input" class="input" maxlength="16" placeholder="输入名字…" autocomplete="off">
-        <label class="field-label">选择头像</label>
+        <label class="field-label" for="name-input" data-i18n="yourName">Your Name</label>
+        <input id="name-input" class="input" maxlength="16" placeholder="Enter name…" data-i18n-placeholder="namePlaceholder" autocomplete="off">
+        <label class="field-label" data-i18n="chooseAvatar">Choose Avatar</label>
         <div id="avatar-picker" class="avatar-picker"></div>
       </div>
 
       <div class="card actions-card">
         <div class="countdown-picker">
-          <span class="field-label">倒计时时长（秒）</span>
+          <span class="field-label" data-i18n="countdownLabel">Countdown (seconds)</span>
           <div class="countdown-options" id="countdown-options">
             <button type="button" class="countdown-option" data-sec="10">10</button>
             <button type="button" class="countdown-option" data-sec="15">15</button>
@@ -103,17 +103,17 @@
           </div>
         </div>
         <button id="btn-start" class="btn btn-secondary" disabled>
-          <span class="material-symbols-outlined">play_arrow</span> 开始游戏
+          <span class="material-symbols-outlined">play_arrow</span> <span data-i18n="startGame">Start Game</span>
         </button>
         <button id="btn-share" class="btn btn-surface">
-          <span class="material-symbols-outlined">share</span> 分享邀请
+          <span class="material-symbols-outlined">share</span> <span data-i18n="shareInvite">Share Invite</span>
         </button>
       </div>
     </aside>
 
     <section class="contestants">
       <div class="contestants-head">
-        <h3>参赛者 <span class="material-symbols-outlined head-ico">celebration</span></h3>
+        <h3><span data-i18n="contestants">Contestants</span> <span class="material-symbols-outlined head-ico">celebration</span></h3>
         <span id="lobby-count" class="pill">0 / 18</span>
       </div>
       <div id="player-grid" class="player-grid"></div>
@@ -127,7 +127,7 @@
   <aside class="clock-panel">
     <div id="clock" class="clock hidden-clock">
       <span id="clock-num" class="clock-num">10</span>
-      <span id="clock-sub" class="clock-sub">秒</span>
+      <span id="clock-sub" class="clock-sub">s</span>
     </div>
   </aside>
 
@@ -160,14 +160,14 @@
     </div>
 
     <aside class="diff-panel">
-      <h3 class="diff-title">时差排行 <span class="material-symbols-outlined">schedule</span></h3>
+      <h3 class="diff-title"><span data-i18n="diffTitle">Time Diff</span> <span class="material-symbols-outlined">schedule</span></h3>
       <div id="diff-list" class="diff-list"></div>
     </aside>
   </div>
 
   <footer class="game-footer">
     <button id="btn-grab" class="grab-btn">
-      <span class="material-symbols-outlined">front_hand</span> 抢！
+      <span class="material-symbols-outlined">front_hand</span> <span data-i18n="grab">GRAB!</span>
     </button>
   </footer>
 
@@ -179,7 +179,7 @@
         <img id="winner-avatar" class="winner-avatar" alt="">
       </div>
       <div id="winner-name" class="winner-name">—</div>
-      <div id="winner-sub" class="winner-sub">下一轮即将开始…</div>
+      <div id="winner-sub" class="winner-sub">Next round coming soon…</div>
     </div>
   </div>
 </main>
@@ -195,12 +195,12 @@
       <div id="lb-rank1" class="lb-rank1"></div>
       <div class="lb-actions">
         <button id="btn-lobby" class="btn btn-surface">
-          <span class="material-symbols-outlined">logout</span> 回到大厅
+          <span class="material-symbols-outlined">logout</span> <span data-i18n="backToLobby">Back to Lobby</span>
         </button>
       </div>
     </div>
     <div class="lb-right">
-      <h3 class="lb-lead-title">排行榜</h3>
+      <h3 class="lb-lead-title" data-i18n="leaderboardTitle">Leaderboard</h3>
       <div id="lb-list" class="lb-list"></div>
     </div>
   </div>
@@ -211,27 +211,27 @@
   <div class="modal-backdrop" data-close-share></div>
   <div class="modal-card">
     <div class="modal-head">
-      <h2 class="modal-title">分享房间</h2>
+      <h2 class="modal-title" data-i18n="shareRoom">Share Room</h2>
       <button id="btn-share-close" class="icon-btn" type="button">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    <label class="field-label">邀请链接</label>
+    <label class="field-label" data-i18n="inviteLink">Invite Link</label>
     <div class="copy-row">
       <input id="share-url" class="input copy-field" readonly>
-      <button id="btn-copy-url" class="copy-btn copy-btn-primary" type="button">复制</button>
+      <button id="btn-copy-url" class="copy-btn copy-btn-primary" type="button"><span data-i18n="copy">Copy</span></button>
 
     </div>
-    <label class="field-label">房间号</label>
+    <label class="field-label" data-i18n="roomCodeLabel">Room Code</label>
     <div class="copy-row">
       <div id="share-code" class="copy-field code-field">—</div>
-      <button id="btn-copy-code" class="copy-btn copy-btn-secondary" type="button">复制</button>
+      <button id="btn-copy-code" class="copy-btn copy-btn-secondary" type="button"><span data-i18n="copy">Copy</span></button>
     </div>
   </div>
 </div>
 
 <div id="toast" class="toast" hidden></div>
 
-<script src="/game.js?v=19"></script>
+<script src="/game.js?v=20"></script>
 </body>
 </html>
