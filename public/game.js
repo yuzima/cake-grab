@@ -554,11 +554,8 @@
   // ---------- Countdown loop ----------
   function updateClock() {
     const phase = state.phase;
-    el.clockNum.classList.toggle('bouncing', phase === 'ready');
     if (phase === 'ready') {
-      el.clock.classList.remove('hidden-clock');
-      el.clockNum.textContent = '准备';
-      el.clockSub.textContent = '';
+      el.clock.classList.add('hidden-clock');
       lastShown = null;
       return;
     }
