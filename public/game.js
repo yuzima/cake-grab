@@ -239,7 +239,7 @@
 
   // ---------- Profile ----------
   function restoreProfile() {
-    const saved = localStorage.getItem('cakewait-profile');
+    const saved = localStorage.getItem('cakegrab-profile');
     if (!saved) return;
     try {
       const p = JSON.parse(saved);
@@ -249,7 +249,7 @@
     } catch { /* ignore */ }
   }
   function saveProfile(name) {
-    localStorage.setItem('cakewait-profile', JSON.stringify({ name }));
+    localStorage.setItem('cakegrab-profile', JSON.stringify({ name }));
   }
 
   // ---------- Render dispatch ----------
