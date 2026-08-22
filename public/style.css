@@ -458,10 +458,25 @@ body { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
   box-shadow: 2px 2px 0 0 var(--ink);
 }
 .diff-tag {
-  font-size: 18px; font-weight: 700; font-style: italic;
-  -webkit-text-stroke: 1px var(--ink);
-  text-shadow: 2px 2px 0 var(--ink);
-  min-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 3px 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  white-space: nowrap;
+  background: var(--surface);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+.diff-tag:empty {
+  background: transparent;
+  border: 3px solid transparent;
+  box-shadow: none;
 }
 .diff-tag.early { color: var(--early); }
 .diff-tag.late { color: var(--late); }
