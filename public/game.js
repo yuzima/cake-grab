@@ -87,6 +87,8 @@
       results: 'Results',
       roundN: 'Round {n} / {max}',
       homeTitle: 'Ready to <span class="home-accent">Grab?</span>',
+      tabCreate: 'Create',
+      tabJoin: 'Join',
       createRoomTitle: 'Create Room',
       createRoomDesc: 'Start a new room and invite your friends!',
       createRoom: 'Create Room',
@@ -140,6 +142,8 @@
       results: '结算',
       roundN: '第 {n} / {max} 轮',
       homeTitle: '准备<span class="home-accent">抢蛋糕？</span>',
+      tabCreate: '创建',
+      tabJoin: '加入',
       createRoomTitle: '创建房间',
       createRoomDesc: '开启一个新房间，邀请好友一起玩！',
       createRoom: '创建房间',
@@ -910,8 +914,26 @@
     }
   }
 
-  el.btnCreate.addEventListener('click', createRoom);
+  // home tabs (mobile): switch between create / join panels
+  const homeTabButtons = [...document.querySelectorAll('.home-tab')];
+  const homeCardCreate = document.querySelector('.home-card-host');
+  const homeCardJoin = document.querySelector('.home-card-join');
+  function setHomeTab(tab) {
+    homeTabButtons.forEach((b) => {
+      const active = b.dataset.tab === tab;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-selected', String(active));
+    });
+    homeCardCreate.classList.toggle('active', tab === 'create');
+    homeCardJoin.classList.toggle('active', tab === 'join');
+    if (tab === 'join') {
+      const firstPin = document.querySelector('.pin-input');
+      if (firstPin) setTimeout(() => firstPin.focus(), 0);
+    }
+  }
+  homeTabButtons.forEach((b) => b.addEventListener('click', () => setHomeTab(b.dataset.tab)));
 
+  el.btnCreate.addEventListener('click', createRoom);
   el.btnJoin.addEventListener('click', () => {
     const code = readPin();
     if (code == null) {

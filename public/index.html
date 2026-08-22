@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=13">
+<link rel="stylesheet" href="/style.css?v=14">
 </head>
 <body>
 <div class="dots-bg" aria-hidden="true"></div>
@@ -35,8 +35,13 @@
       <h1 class="home-title" data-i18n-html="homeTitle">Ready to <span class="home-accent">Grab?</span></h1>
     </div>
 
+    <div class="home-tabs" role="tablist">
+      <button type="button" class="home-tab active" id="tab-create" role="tab" aria-selected="true" data-tab="create" data-i18n="tabCreate">Create</button>
+      <button type="button" class="home-tab" id="tab-join" role="tab" aria-selected="false" data-tab="join" data-i18n="tabJoin">Join</button>
+    </div>
+
     <div class="home-grid">
-      <div class="card home-card home-card-host">
+      <div class="card home-card home-card-host active">
         <span class="material-symbols-outlined home-ico">add_circle</span>
         <h2 class="home-card-title" data-i18n="createRoomTitle">Create Room</h2>
         <p class="home-card-desc" data-i18n="createRoomDesc">Start a new room and invite your friends!</p>
@@ -233,6 +238,6 @@
 
 <div id="toast" class="toast" hidden></div>
 
-<script src="/game.js?v=22"></script>
+<script src="/game.js?v=23"></script>
 </body>
 </html>
