@@ -689,6 +689,8 @@ body { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
 /* responsive */
 @media (max-width: 900px) {
   .lobby-grid, .lb-grid { grid-template-columns: 1fr; padding: 24px 16px; gap: 24px; }
+  .lb-grid { flex: none; }
+  .lb-list { flex: none; overflow: visible; }
   .lobby-left { display: contents; }
   .contestants { order: 1; }
   .actions-card { order: 2; }
