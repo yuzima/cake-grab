@@ -248,6 +248,14 @@ body { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
   border-color: var(--ink);
 }
 
+.profile-actions { display: none; }
+.profile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 27, 28, 0.5);
+  z-index: 190;
+}
+
 .actions-card { display: flex; flex-direction: column; gap: 14px; background: var(--primary-container); }
 
 .countdown-picker { display: flex; flex-direction: column; gap: 10px; }
@@ -958,6 +966,20 @@ body { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
   .home-card.active { display: flex; }
   /* lobby: show only one empty "waiting" slot on phones */
   .player-card.empty ~ .player-card.empty { display: none; }
+  /* profile panel becomes a modal on phones */
+  .join-card { display: none; }
+  .join-card.open {
+    display: flex;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(92vw, 400px);
+    max-height: 85vh;
+    overflow-y: auto;
+    z-index: 200;
+  }
+  .profile-actions { display: flex; gap: 12px; margin-top: 4px; }
+  .profile-actions .btn { flex: 1; }
 }
 
 @media (max-width: 600px) {

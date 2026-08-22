@@ -21,6 +21,10 @@
     playerGrid: $('#player-grid'),
     nameInput: $('#name-input'),
     avatarPicker: $('#avatar-picker'),
+    joinCard: $('#join-card'),
+    btnProfileSave: $('#btn-profile-save'),
+    btnProfileCancel: $('#btn-profile-cancel'),
+    profileBackdrop: $('#profile-backdrop'),
     btnStart: $('#btn-start'),
     btnShare: $('#btn-share'),
     countdownOptions: document.querySelectorAll('.countdown-option'),
@@ -131,6 +135,8 @@
       enterRoomCode: 'Enter the 4-digit room code',
       linkCopied: 'Link copied — send it to your friends!',
       codeCopied: 'Room code copied',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
     },
     zh: {
       title: 'Cake Grab — 节奏抢蛋糕',
@@ -186,6 +192,8 @@
       enterRoomCode: '请输入 4 位房间号',
       linkCopied: '链接已复制，发给朋友加入吧！',
       codeCopied: '房间号已复制',
+      cancel: '取消',
+      confirm: '确定',
     },
   };
 
@@ -473,13 +481,63 @@
     }
   }
 
-  function selectAvatar(n) {
-    const me = selfPlayer();
-    if (me) saveProfile(me.name);
-    send({ type: 'update', name: selfPlayer() ? selfPlayer().name : '', avatar: n });
+  // profile modal state (mobile only)
+  let profileStaged = false;
+  let stagedName = '';
+  let stagedAvatar = 1;
+
+  function highlightAvatar(n) {
     el.avatarPicker.querySelectorAll('.avatar-option').forEach((o) => {
       o.classList.toggle('selected', o.dataset.avatar === String(n));
     });
+  }
+
+  function selectAvatar(n) {
+    if (profileStaged) {
+      stagedAvatar = n;
+      highlightAvatar(n);
+      return;
+    }
+    const me = selfPlayer();
+    if (me) saveProfile(me.name);
+    send({ type: 'update', name: selfPlayer() ? selfPlayer().name : '', avatar: n });
+    highlightAvatar(n);
+  }
+
+  function openProfileModal() {
+    if (!window.matchMedia('(max-width: 760px)').matches) return;
+    const me = selfPlayer();
+    if (!me) return;
+    stagedName = me.name || '';
+    stagedAvatar = me.avatar || 1;
+    profileStaged = true;
+    el.nameInput.value = stagedName;
+    highlightAvatar(stagedAvatar);
+    el.joinCard.classList.add('open');
+    el.profileBackdrop.hidden = false;
+    setTimeout(() => el.nameInput.focus(), 0);
+  }
+
+  function closeProfileModal() {
+    profileStaged = false;
+    el.joinCard.classList.remove('open');
+    el.profileBackdrop.hidden = true;
+  }
+
+  function confirmProfile() {
+    const me = selfPlayer();
+    const name = (stagedName != null ? stagedName : (me ? me.name : '')).trim();
+    const avatar = stagedAvatar != null ? stagedAvatar : (me ? me.avatar : 1);
+    closeProfileModal();
+    saveProfile(name);
+    send({ type: 'update', name, avatar });
+  }
+
+  function cancelProfile() {
+    const me = selfPlayer();
+    closeProfileModal();
+    el.nameInput.value = me ? (me.name || '') : '';
+    highlightAvatar(me ? (me.avatar || 1) : 1);
   }
 
   function renderLobby(me) {
@@ -492,13 +550,15 @@
     el.roomChip.textContent = t('roomChip', { code: state.roomCode });
 
 
-    // name input (reflect self name without clobbering focus)
-    if (me && document.activeElement !== el.nameInput) el.nameInput.value = me.name;
+    // name input (reflect self name without clobbering focus or staged edits)
+    if (me && !profileStaged && document.activeElement !== el.nameInput) el.nameInput.value = me.name;
 
-    // avatar selection highlight
-    el.avatarPicker.querySelectorAll('.avatar-option').forEach((o) => {
-      o.classList.toggle('selected', me && o.dataset.avatar === String(me.avatar));
-    });
+    // avatar selection highlight (skip while staging)
+    if (!profileStaged) {
+      el.avatarPicker.querySelectorAll('.avatar-option').forEach((o) => {
+        o.classList.toggle('selected', me && o.dataset.avatar === String(me.avatar));
+      });
+    }
 
     // start button
     const canStart = me && me.isHost && n >= state.minPlayers;
@@ -827,6 +887,10 @@
 
   let nameDebounce = null;
   el.nameInput.addEventListener('input', () => {
+    if (profileStaged) {
+      stagedName = el.nameInput.value;
+      return;
+    }
     clearTimeout(nameDebounce);
     nameDebounce = setTimeout(() => {
       const name = el.nameInput.value;
@@ -837,6 +901,14 @@
   });
   el.nameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); el.nameInput.blur(); }
+  });
+
+  // profile modal (mobile): open on self avatar tap, confirm/cancel
+  el.btnProfileSave.addEventListener('click', confirmProfile);
+  el.btnProfileCancel.addEventListener('click', cancelProfile);
+  el.profileBackdrop.addEventListener('click', cancelProfile);
+  el.playerGrid.addEventListener('click', (e) => {
+    if (e.target.closest('.player-card.self')) openProfileModal();
   });
 
   // unlock audio on first interaction

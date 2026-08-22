@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=15">
+<link rel="stylesheet" href="/style.css?v=16">
 </head>
 <body>
 <div class="dots-bg" aria-hidden="true"></div>
@@ -90,11 +90,15 @@
         <p id="lobby-status" class="lobby-status">Waiting for players (0/18)</p>
       </div>
 
-      <div class="card join-card">
+      <div class="card join-card" id="join-card">
         <label class="field-label" for="name-input" data-i18n="yourName">Your Name</label>
         <input id="name-input" class="input" maxlength="16" placeholder="Enter name…" data-i18n-placeholder="namePlaceholder" autocomplete="off">
         <label class="field-label" data-i18n="chooseAvatar">Choose Avatar</label>
         <div id="avatar-picker" class="avatar-picker"></div>
+        <div class="profile-actions">
+          <button id="btn-profile-cancel" class="btn btn-surface" type="button" data-i18n="cancel">Cancel</button>
+          <button id="btn-profile-save" class="btn btn-secondary" type="button" data-i18n="confirm">Confirm</button>
+        </div>
       </div>
 
       <div class="card actions-card">
@@ -236,8 +240,9 @@
   </div>
 </div>
 
+<div id="profile-backdrop" class="profile-backdrop" hidden></div>
 <div id="toast" class="toast" hidden></div>
 
-<script src="/game.js?v=25"></script>
+<script src="/game.js?v=26"></script>
 </body>
 </html>
