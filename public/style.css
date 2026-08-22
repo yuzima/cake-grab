@@ -956,6 +956,8 @@ body { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
   .home-tabs { display: flex; gap: 8px; width: 100%; }
   .home-card { display: none; }
   .home-card.active { display: flex; }
+  /* lobby: show only one empty "waiting" slot on phones */
+  .player-card.empty ~ .player-card.empty { display: none; }
 }
 
 @media (max-width: 600px) {

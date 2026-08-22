@@ -525,7 +525,7 @@
           <span class="pc-name">${esc(p.name)}</span>
         </div>`);
     }
-    if (n < state.maxPlayers) {
+    for (let i = n; i < state.maxPlayers; i++) {
       cells.push(`
         <div class="player-card empty">
           <span class="material-symbols-outlined">person_add</span>
