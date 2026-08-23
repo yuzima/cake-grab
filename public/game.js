@@ -45,6 +45,12 @@
     btnCopyUrl: $('#btn-copy-url'),
     btnCopyCode: $('#btn-copy-code'),
 
+    // help / rules modal
+    helpModal: $('#help-modal'),
+    btnHelp: $('#btn-help'),
+    btnHelpClose: $('#btn-help-close'),
+    btnHelpOk: $('#btn-help-ok'),
+
 
     // game
     arena: $('#arena'),
@@ -137,6 +143,11 @@
       codeCopied: 'Room code copied',
       cancel: 'Cancel',
       confirm: 'Confirm',
+      close: 'Close',
+      howToPlay: 'How to Play',
+      helpStep1: 'When the countdown starts, focus and listen to the rhythm.',
+      helpStep2: 'In the final seconds the clock disappears — press GRAB the instant it hits 0!',
+      helpStep3: 'Whoever is closest to 0 grabs the cake.',
     },
     zh: {
       title: 'Cake Grab — 节奏抢蛋糕',
@@ -194,6 +205,11 @@
       codeCopied: '房间号已复制',
       cancel: '取消',
       confirm: '确定',
+      close: '关闭',
+      howToPlay: '游戏说明',
+      helpStep1: '倒计时开始后，请集中注意力听节奏。',
+      helpStep2: '在最后几秒，钟表会消失，你需要凭感觉在 0 秒瞬间按下 GRAB！',
+      helpStep3: '最接近 0 秒的人将抢到蛋糕。',
     },
   };
 
@@ -208,6 +224,7 @@
     document.querySelectorAll('[data-i18n]').forEach((n) => { n.textContent = t(n.dataset.i18n); });
     document.querySelectorAll('[data-i18n-html]').forEach((n) => { n.innerHTML = t(n.dataset.i18nHtml); });
     document.querySelectorAll('[data-i18n-placeholder]').forEach((n) => { n.placeholder = t(n.dataset.i18nPlaceholder); });
+    document.querySelectorAll('[data-i18n-aria]').forEach((n) => { n.setAttribute('aria-label', t(n.dataset.i18nAria)); });
   }
 
   // ---------- State ----------
@@ -972,6 +989,14 @@
     el.shareModal.hidden = true;
   }
 
+  function openHelpModal() {
+    el.helpModal.hidden = false;
+  }
+
+  function closeHelpModal() {
+    el.helpModal.hidden = true;
+  }
+
   function copyText(text, okMessage) {
     const done = () => toast(okMessage);
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1033,6 +1058,10 @@
       }
     });
   });
+  el.btnHelp.addEventListener('click', openHelpModal);
+  el.btnHelpClose.addEventListener('click', closeHelpModal);
+  el.btnHelpOk.addEventListener('click', closeHelpModal);
+  el.helpModal.querySelector('.modal-backdrop').addEventListener('click', closeHelpModal);
 
   el.btnShareClose.addEventListener('click', closeShareModal);
   el.shareModal.querySelector('.modal-backdrop').addEventListener('click', closeShareModal);

@@ -979,6 +979,69 @@ body { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
 .copy-btn-primary { background: var(--primary-container); color: var(--on-primary-container); }
 .copy-btn-secondary { background: var(--secondary-container); color: var(--on-secondary-container); }
 
+/* ---------- Help button (lobby) ---------- */
+.help-btn {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  box-shadow: 4px 4px 0 0 var(--ink);
+  cursor: pointer;
+  z-index: 5;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.help-btn:hover { box-shadow: 6px 6px 0 0 var(--ink); transform: translate(-2px, -2px); }
+.help-btn:active { box-shadow: 0 0 0 0 var(--ink); transform: translate(4px, 4px); }
+.help-btn .material-symbols-outlined { font-size: 28px; font-weight: 700; }
+
+/* ---------- Help / rules modal ---------- */
+.help-hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0 8px;
+}
+.help-hero img { width: 150px; height: auto; }
+
+.help-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.help-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.help-step-num {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--secondary);
+  color: var(--on-secondary);
+  font-weight: 700;
+  font-size: 16px;
+}
+
 @media (max-width: 760px) {
   .home-grid { grid-template-columns: 1fr; }
   .home-tabs { display: flex; gap: 8px; width: 100%; }
